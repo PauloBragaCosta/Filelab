@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//npx prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Paciente {
+  PacientId       Int      @id @default(autoincrement())
+  nomeCompleto    String
+  especie         String
+  sexo            String
+  dataNascimento  DateTime
+  raca            String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tutorId         String?
+  ExameDoPaciente Exame[]
+  Tutor           Tutor?   @relation(fields: [tutorId], references: [idTutor])
+}
+
+model Tutor {
+  idTutor                  String     @id @default(uuid())
+  nameTutor                String // Nome completo
+  telephoneTutor           String // Telefone
+  emailTutor               String // Email
+  communicationEmailsTutor Boolean // Comunicação por email
+  marketingEmailsTutor     Boolean // E-mails de marketing
+  socialWhatsappTutor      Boolean // Comunicação por Whatsapp
+  PacientesTutor           Paciente[]
+}
+
+model Medico {
+  idMedico                  String  @id @default(uuid())
+  nameMedico                String // Nome completo do médico
+  telephoneMedico           String // Telefone do médico, incluindo o DDD
+  emailMedico               String // Email do médico
+  crmv                      String // Número do CRMV do médico
+  comunicacaoEmailsMedico   Boolean // Indica se o usuário deseja receber e-mails sobre o diagnóstico do pet
+  marketingEmailsMedico     Boolean // Indica se o usuário deseja receber e-mails sobre novos produtos, recursos e muito mais
+  comunicacaoWhatsappMedico Boolean // Indica se o usuário deseja receber notificações por Whatsapp sobre o diagnóstico do pet
+  examedoMedico             Exame[]
+}
+
+model Exame {
+  idExame           Int       @id @default(autoincrement())
+  amostra           String? // Tipo de amostra enviada (tubo, pote, lâmina, outros)
+  amostraType       String[] // Quantidade de frascos
+  clinicalSuspicion String? // Suspeita clínica
+  observation       String? // Observação (histórico, sinais clínicos, tratamento submetido)
+  DateTimeColeta    DateTime? // Data de coleta
+  exameTipo         String? // Tipo de exame (anatomia patológica, citopatologia, análise líquidos, análise hematológica, análise bioquímica)
+  IdPaciente        Int?   @unique
+  medicoId          String?
+  Paciente             Paciente? @relation(fields: [IdPaciente], references: [PacientId])
+  Medico            Medico?   @relation(fields: [medicoId], references: [idMedico])
+}
