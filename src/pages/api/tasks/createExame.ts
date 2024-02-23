@@ -1,4 +1,3 @@
-
 import { prisma } from "../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next"
 
@@ -7,9 +6,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   let { amostra, amostraType, clinicalSuspicion, observation, DateTimeColeta, exameTipo } = data
 
-  let {IdPaciente} = IdPacientebody
-  let {medico} = Idmedicobody
-
+  let {IdPaciente} = JSON.parse(IdPacientebody);
+  let medico = JSON.parse(Idmedicobody);
 
 
   await prisma.exame.create({

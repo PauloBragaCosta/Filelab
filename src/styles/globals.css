@@ -74,3 +74,48 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes pulsecolor {
+  0%, 100% {
+    background-color: #bfdbfe; /* from-blue-200 */
+  }
+  33% {
+    background-color: #a7f3d0; /* via-green-200 */
+  }
+  66% {
+    background-color: #fce7f3; /* to-pink-200 */
+  }
+}
+
+@keyframes pulsecolortext {
+  0%, 100% {
+    color: #3b82f6; /* blue-600 */
+  }
+  33% {
+    color: #059669; /* green-600 */
+  }
+  66% {
+    color: #ec4899; /* pink-600 */
+  }
+}
+
+@keyframes border-pulsecolor {
+  0%, 100% {
+    border-color: #bfdbfe; /* from-blue-200 */
+  }
+  33% {
+    border-color: #a7f3d0; /* via-green-200 */
+  }
+  66% {
+    border-color: #fce7f3; /* to-pink-200 */
+  }
+}
+
+
+
+
+.pulse-button {
+  animation: border-pulsecolor 5s ease-in-out infinite;
+  border-width: 2px;
+}
+

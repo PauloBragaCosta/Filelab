@@ -1,5 +1,10 @@
+"use client"
+
 import { Separator } from "../../../components/ui/separator"
 import { AccountForm } from "../../register/patient/account-form"
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+const queryClient = new QueryClient();
 
 export default function SettingsAccountPage() {
   return (
@@ -11,7 +16,10 @@ export default function SettingsAccountPage() {
         </p>
       </div>
       <Separator />
+
+      <QueryClientProvider client={queryClient}>
       <AccountForm />
+    </QueryClientProvider>
     </div>
   )
 }

@@ -19,7 +19,7 @@ module.exports = {
       },
       screens: {
         "2xl": "1400px",
-      },
+      }
     },
     extend: {
       colors: {
@@ -55,7 +55,8 @@ module.exports = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
+        },       
+       
       },
       borderRadius: {
         lg: "var(--radius)",

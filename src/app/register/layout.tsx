@@ -6,6 +6,7 @@ import { SidebarNav } from "./components/sidebar-nav"
 import Header from "@/components/Pages/menus/header"
 
 
+// https://youtu.be/6JnkwfrAI-U?si=ANF8bv0Dgaq_wOti Veja esse vide de novo paulo para corrigir os problemas 
 
 const sidebarNavItems = [
   {

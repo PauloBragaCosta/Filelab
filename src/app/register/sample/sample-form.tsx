@@ -25,7 +25,6 @@ import {
   PopoverTrigger,
 } from "../../../components/ui/popover"
 import { toast } from "../../../components/ui/use-toast"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useRouter } from "next/navigation"
@@ -116,8 +115,8 @@ export function AccountForm() {
     event?.preventDefault();
     console.log(data);
     
-    const IdPacientebody = sessionStorage.getItem('IdPaciente');
-    const Idmedicobody = sessionStorage.getItem('MedicoId');
+    const IdPacientebody = sessionStorage.getItem('IdPaciente'); // '{"IdPaciente":29}'
+    const Idmedicobody = sessionStorage.getItem('MedicoId'); // '"9745e3a2-2cd5-4993-8203-c291358a06cb"'
 
     const body = {
       data,

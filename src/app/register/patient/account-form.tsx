@@ -16,8 +16,6 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
-  CommandSeparator,
 } from "../../../components/ui/command"
 import {
   Form,
@@ -46,8 +44,10 @@ import { toast } from "../../../components/ui/use-toast"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { TutorForm } from "../tutor/tutor-form copy"
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MedicoForm } from "../doctor/doctor-form copy"
+import { SparklesIcon } from "lucide-react"
+import axios from 'axios'
 
 
 const breed = [
@@ -63,18 +63,12 @@ const breed = [
 ] as const;
 
 
-const species = [
+const especies = [
   { label: "Equino", value: "Equino" },
   { label: "Caprino", value: "Caprino" },
   { label: "canino", value: "canino" },
+  { label: "felino", value: "felino" },
 ] as const;
-
-const gender = [
-  { label: "Macho", value: "Macho" },
-  { label: "Fêmea", value: "Fêmea" },
-] as const;
-
-
 
 type Tutor = {
   label: string;
@@ -85,6 +79,7 @@ type Medico = {
   label: string;
   value: string;
 };
+
 
 const accountFormSchema = z.object({
   nomeCompleto: z.string({
@@ -113,15 +108,18 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 
+
 // This can come from your database or API.
 const defaultValues: Partial<AccountFormValues> = {
-  // nomeCompleto: "Your name",
+  // nomeCompleto: pacienteForm,
   // dataNascimento: new Date("2023-01-23"),
   // raca: "yorkshire",
   // especie: "canino",
   // sexo: "femea",
 
 }
+
+
 
 
 
@@ -142,6 +140,40 @@ export function AccountForm() {
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   });
+
+
+
+
+
+  const [iAForm, setIAForm] = useState(false);
+
+  useEffect(() => {
+    const pacienteSON = sessionStorage.getItem('PacienteSON');
+    if (pacienteSON) {
+      setIAForm(true);
+    }
+  }, [])
+
+  const [pacienteForm, setPacienteForm] = useState("")
+  const [especieForm, setEspecieForm] = useState("")
+  const [sexoForm, setsexoForm] = useState("")
+  const [idadeForm, setIdadeForm] = useState("")
+
+  async function preencherFormulario() {
+
+
+    setPacienteForm(JSON.parse(sessionStorage.getItem('PacienteSON') as string))
+    setEspecieForm(JSON.parse(sessionStorage.getItem('EspecieSON') as string))
+
+    setsexoForm(JSON.parse(sessionStorage.getItem('SexoSON') as string))
+
+
+
+
+    const IdadeJSON = JSON.parse(sessionStorage.getItem('IdadeSON') as string);
+    const TelefoneJSON = JSON.parse(sessionStorage.getItem('TelefoneSON') as string);
+
+  }
 
 
 
@@ -169,7 +201,7 @@ export function AccountForm() {
 
 
 
-  
+
 
     // Redirecione para a página do tutor
     router.push('/register/sample');
@@ -244,10 +276,25 @@ export function AccountForm() {
     return formattedPosts;
   }
 
+  const [open, setOpen] = React.useState(false)
+  const [value, setValue] = React.useState("")
 
   return (
+
     <Form {...form}>
+      {iAForm &&
+        <div className="">
+          <button className="w-[200px] h-[30px] rounded-full items-center border-2 pulse-button hover:border-transparent hover:animate-[pulsecolor_5s_ease-in-out_infinite]" onClick={preencherFormulario}>
+            <div className="flex items-center justify-content-end gap-1 ml-2">
+              <SparklesIcon className="text-gray-600" />
+              <h1 className="text-gray-800">Preencher Formulário</h1>
+            </div>
+          </button>
+        </div>
+      }
+
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
         <FormField
           control={form.control}
           name="nomeCompleto"
@@ -255,7 +302,11 @@ export function AccountForm() {
             <FormItem>
               <FormLabel>Paciente</FormLabel>
               <FormControl>
-                <Input placeholder="Nome Completo" {...field} />
+                <Input
+                  placeholder="Nome Completo"
+                  value={pacienteForm || field.value}
+                  onChange={e => setPacienteForm(e.target.value)}
+                />
               </FormControl>
               <FormDescription>
                 Este é o nome do animal
@@ -264,93 +315,67 @@ export function AccountForm() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="especie"
           render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Espécie</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="canino" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      Canino
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="felino" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      Felino
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="outros" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className={cn(
-                                "w-[200px] justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value
-                                ? species.find(
-                                  (species) => species.value === field.value
-                                )?.label
-                                : "Selecione uma espécie"}
-                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-0">
-                          <Command>
-                            <CommandInput placeholder="Pesquise a espécies..." />
-                            <CommandEmpty>Nenhuma Espécies encontrada.</CommandEmpty>
-                            <CommandGroup>
-                              {species.map((species) => (
-                                <CommandItem
-                                  value={species.label}
-                                  key={species.value}
-                                  onSelect={() => {
-                                    form.setValue("especie", species.value)
-                                  }}
-                                >
-                                  <CheckIcon
-                                    className={cn(
-                                      "h-4 w-4 shrink-0",
-                                      field.value === species.value && "text-primary"
-                                    )}
-                                  />
-                                  {species.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
+            <FormItem className="flex flex-col">
+              <FormLabel>Selecione a especie do animal</FormLabel>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-[200px] justify-between"
+                  >
+                    {value
+                      ? especies.find((especie) => especie.value === value)?.label
+                      : "Select especie..."}
+                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search especie..." className="h-9" />
+                    <CommandEmpty>No especie found.</CommandEmpty>
+                    <CommandGroup>
+                      {especies.map((especie) => (
+                        <CommandItem
+                          key={especie.value}
+                          value={especieForm || field.value}
+
+                          onSelect={(currentValue) => {
+                            setValue(currentValue === value ? "" : currentValue)
+                            setOpen(false)
+                          }}
+                        >
+                          {especie.label}
+                          <CheckIcon
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              value === especie.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormDescription>
+                Selecione a especie do animal.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
+
+
+
+
 
         <FormField
           control={form.control}
@@ -361,12 +386,12 @@ export function AccountForm() {
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={sexoForm || field.value}
                   className="flex flex-col space-y-1"
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="canino" />
+                      <RadioGroupItem value="Macho" />
                     </FormControl>
                     <FormLabel className="font-normal">
                       Macho
@@ -374,7 +399,7 @@ export function AccountForm() {
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="felino" />
+                      <RadioGroupItem value="Fêmea" />
                     </FormControl>
                     <FormLabel className="font-normal">
                       Fêmea
@@ -681,4 +706,3 @@ export function AccountForm() {
 
   )
 }
-
