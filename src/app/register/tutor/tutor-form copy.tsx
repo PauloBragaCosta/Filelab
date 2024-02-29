@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import * as React from "react"
 
 import {
   Form,
@@ -17,6 +18,7 @@ import { Input } from "../../../components/ui/input"
 
 import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Switch } from "@/components/ui/switch"
+import { revalidateTag } from "next/cache"
 
 
 const tutorFormSchema = z.object({
@@ -43,15 +45,28 @@ const defaultValues: Partial<TutoresFormValues> = {
 }
 
 
-export function TutorForm() {
+
+export function TutorForm({
+  onStatusChange,
+}: {
+  onStatusChange: (data: any) => void
+}) {
+
+const handleStatusSelect = (data: String) => {
+  console.log(data)
+  onStatusChange(data)
+  
+};
+ 
+
+
   const form = useForm<TutoresFormValues>({
     mode: "all",
     defaultValues,
   });
 
   const onSubmit = async (data: TutoresFormValues) => {
-
-    console.log(data)
+    handleStatusSelect(data.nameTutor)
 
     // Ajustar o código para fazer a solicitação do servidor
     const response = await fetch(
@@ -64,6 +79,8 @@ export function TutorForm() {
         },
       }
     );
+
+    revalidateTag('get-tags')
 
     if (response.status === 201) {
       // Sucesso!
@@ -81,8 +98,10 @@ export function TutorForm() {
     }
   };
 
+ 
+
   async function salvar() {
-    form.handleSubmit(onSubmit)();
+        form.handleSubmit(onSubmit)();
   }
 
 

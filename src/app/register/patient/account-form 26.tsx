@@ -47,17 +47,15 @@ import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import React, { useEffect, useState } from 'react';
 import { MedicoForm } from "../doctor/doctor-form copy"
 import { SparklesIcon } from "lucide-react"
-import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
-import { ComboBoxResponsiveMedicoAndTutor } from "@/components/ui/Combobox-tutor-medico"
 
-const especie: Status[] = [
+const especies = [
   { label: "Equino", value: "equino" },
   { label: "Caprino", value: "caprino" },
   { label: "Canino", value: "canino" },
   { label: "Felino", value: "felino" },
 ] as const;
 
-const race: Status[] = [
+const breed = [
   { label: "Labrador Retriever", value: "labrador" },
   { label: "Bulldog Francês", value: "bulldog_frances" },
   { label: "Poodle", value: "poodle" },
@@ -110,10 +108,10 @@ type AccountFormValues = z.infer<typeof accountFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<AccountFormValues> = {
-  //nomeCompleto: "pacientes",
+  nomeCompleto: "pacienteForm",
   // dataNascimento: new Date("2023-01-23"),
   // raca: "yorkshire",
-  //especie: "canino",
+  especie: "canino",
   // sexo: "femea",
 
 }
@@ -124,9 +122,7 @@ const defaultValues: Partial<AccountFormValues> = {
 
 export function AccountForm() {
 
-  const [openEspecie, setOpenEspecie] = React.useState(false)
   const [openRaca, setOpenRaca] = React.useState(false)
-
 
 
   const [TutorData, setTutorData] = useState<{ label: string, value: string }[]>([]);
@@ -141,61 +137,9 @@ export function AccountForm() {
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   });
-
-  const [iAForm, setIAForm] = useState(false);
-
-  useEffect(() => {
-    const pacienteSON = sessionStorage.getItem('PacienteSON');
-    if (pacienteSON) {
-      setIAForm(true);
-    }
-  }, [])
-
-  const [pacienteForm, setPacienteForm] = useState("")
-  const [especieForm, setEspecieForm] = useState("")
-  const [sexoForm, setsexoForm] = useState("")
-  const [idadeForm, setIdadeForm] = useState("")
-
-
-
-
-
+  
   async function onSubmit(data: AccountFormValues) {
     console.log(data);
-
-
-    // Armazene os dados do paciente no localStorage
-    sessionStorage.setItem('pacienteData', JSON.stringify(data));
-
-    const response = await fetch('http://localhost:3000/api/tasks/create', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const jsonResponse = await response.json();
-    const medicoid = data.medico
-
-
-    sessionStorage.setItem('IdPaciente', JSON.stringify(jsonResponse));
-    sessionStorage.setItem('MedicoId', JSON.stringify(medicoid));
-
-    // Redirecione para a página do tutor
-    router.push('/register/sample');
-
-
-
-
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
 
   }
 
@@ -208,11 +152,11 @@ export function AccountForm() {
         'Content-Type': 'application/json'
       },
       next: {
-        tags: ['get-tags']
+        tags: ['get-tags-tutor']
       }
     });
 
-
+    
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -241,7 +185,7 @@ export function AccountForm() {
         'Content-Type': 'application/json'
       },
       next: {
-        tags: ['get-tags']
+        tags: ['get-tags-doctor']
       }
     });
 
@@ -268,33 +212,26 @@ export function AccountForm() {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
 
-  const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
-
-  const handleStatusChange = (status: Status | null) => {
-    setSelectedStatus(status);
-    // Aqui você pode adicionar o código para lidar com a mudança de status
-    console.log(status);
-  };
-
-  const [nameMedicofind, setNameMedicofind] = React.useState("")
-
-
   return (
 
     <Form {...form}>
-      {/* {iAForm &&
-        <div className="">
-          <button className="w-[200px] h-[30px] rounded-full items-center border-2 pulse-button hover:border-transparent hover:animate-[pulsecolor_5s_ease-in-out_infinite]" onClick={preencherFormulario}>
-            <div className="flex items-center justify-content-end gap-1 ml-2">
-              <SparklesIcon className="text-gray-600" />
-              <h1 className="text-gray-800">Preencher Formulário</h1>
-            </div>
-          </button>
-        </div>
-      } */}
-
+     
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
+      <FormField
+  control={form.control}
+  name="nomeCompleto"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Username</FormLabel>
+      <FormControl>
+        <Input placeholder="shadcn" {...field} />
+      </FormControl>
+      <FormDescription>This is your public display name.</FormDescription>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 
         <FormField
           control={form.control}
@@ -304,7 +241,9 @@ export function AccountForm() {
               <FormLabel>Paciente</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Nome Completo" {...field} />
+                  placeholder="Nome Completo"
+                  value={field.value}
+                />
               </FormControl>
               <FormDescription>
                 Este é o nome do animal
@@ -314,22 +253,54 @@ export function AccountForm() {
           )}
         />
 
-
         <FormField
           control={form.control}
           name="especie"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Selecione a especie do animal</FormLabel>
-              <ComboBoxResponsive
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-[200px] justify-between"
+                  >
+                    {value
+                      ? especies.find((especie) => especie.value === value)?.label
+                      : "Select especie..."}
+                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search especie..." className="h-9" />
+                    <CommandEmpty>No especie found.</CommandEmpty>
+                    <CommandGroup>
+                      {especies.map((especie) => (
+                        <CommandItem
+                          key={especie.value}
+                          value={field.value}
 
-                statuses={especie}
-                texArea="especie"
-                onStatusChange={(status) => {
-                  handleStatusChange(status);
-                  field.onChange(status ? status.label : '');
-                }}
-              />
+                          onSelect={(currentValue) => {
+                            setValue(currentValue === value ? "" : currentValue)
+                            setOpen(false)
+                          }}
+                        >
+                          {especie.label}
+                          <CheckIcon
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              value === especie.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <FormDescription>
                 Selecione a especie do animal.
               </FormDescription>
@@ -337,6 +308,9 @@ export function AccountForm() {
             </FormItem>
           )}
         />
+
+
+
 
 
 
@@ -349,7 +323,7 @@ export function AccountForm() {
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
-                  value={sexoForm || field.value}
+                  value={field.value}
                   className="flex flex-col space-y-1"
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
@@ -381,11 +355,10 @@ export function AccountForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Idade Anos Meses</FormLabel>
-              <Popover open={open} onOpenChange={setOpen}>
+              <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      aria-expanded={open}
                       variant={"outline"}
                       className={cn(
                         "w-[240px] pl-3 text-left font-normal",
@@ -427,14 +400,54 @@ export function AccountForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Selecione a raça do animal</FormLabel>
-              <ComboBoxResponsive
-                statuses={race}
-                texArea="raça"
-                onStatusChange={(status) => {
-                  handleStatusChange(status);
-                  field.onChange(status ? status.label : '');
-                }}
-              />
+              <Popover open={openRaca} onOpenChange={setOpenRaca}>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openRaca}
+                      className={cn(
+                        "w-[200px] justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? breed.find(
+                          (breed) => breed.value === field.value
+                        )?.label
+                        : "Selecione a raça"}
+                      <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Pesquise a raça..." />
+                    <CommandEmpty>Nenhuma raça encontrada.</CommandEmpty>
+                    <CommandGroup>
+                      {breed.map((breed) => (
+                        <CommandItem
+                          value={breed.label}
+                          key={breed.value}
+                          onSelect={() => {
+                            form.setValue("raca", breed.value)
+                            setOpenRaca(false)
+                          }}
+                        >
+                          <CheckIcon
+                            className={cn(
+                              "h-4 w-4 shrink-0",
+                              field.value === breed.value && "text-primary"
+                            )}
+                          />
+                          {breed.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <FormDescription>
                 Selecione a raça do animal.
               </FormDescription>
@@ -442,7 +455,6 @@ export function AccountForm() {
             </FormItem>
           )}
         />
-
 
         <Card>
           <CardHeader>
@@ -454,7 +466,66 @@ export function AccountForm() {
                 //aqui 321
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                    <ComboBoxResponsiveMedicoAndTutor findany={'Tutor'} textAreafather={nameMedicofind} formFather={form} fieldFather={field}/>
+                    <Popover open={openTutor} onOpenChange={setOpenTutor}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openTutor}
+                            className={cn(
+                              "w-[500px] justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            onClick={async () => {
+                              await findTutor();
+                              const storedTutorDataItem = sessionStorage.getItem('TutorData');
+                              if (storedTutorDataItem !== null) {
+                                const TutorData = JSON.parse(storedTutorDataItem);
+                                console.log(TutorData);
+                                setTutorData(TutorData); // Atualiza o estado com os dados do tutor
+                              } else {
+                                console.log('No TutorData found in sessionStorage');
+                              }
+                            }}
+                          >
+                            {field.value
+                              ? TutorData?.find(
+                                (tutor: Tutor) => tutor.value === field.value
+                              )?.label
+                              : "Selecione o tutor"}
+                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[500px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Pesquise o tutor..." />
+                          <CommandEmpty>Nenhuma tutor encontrada.</CommandEmpty>
+                          <CommandGroup style={{ maxHeight: '200px', overflowY: 'scroll' }}>
+                            {TutorData?.map((tutor: Tutor) => (
+                              <CommandItem
+                                value={tutor.label}
+                                key={tutor.value}
+                                onSelect={() => {
+                                  form.setValue("tutorId", tutor.value)
+                                  setOpenTutor(false)
+                                }}
+                              >
+                                <CheckIcon
+                                  className={cn(
+                                    "h-4 w-4 shrink-0",
+                                    field.value === tutor.value && "text-primary"
+                                  )}
+                                />
+                                {tutor.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormDescription>
                       Procure o nome do tutor
                     </FormDescription>
@@ -465,9 +536,7 @@ export function AccountForm() {
                       <AlertDialogTrigger asChild >
                         <Button variant="outline">+ cadastrar</Button>
                       </AlertDialogTrigger>
-                      <TutorForm onStatusChange={(newTutorName) => {
-                        setNameMedicofind(newTutorName);
-                      }} />
+                      <TutorForm />
                     </AlertDialog>
                   </div>
                 </FormItem>
@@ -481,9 +550,69 @@ export function AccountForm() {
               control={form.control}
               name="medico"
               render={({ field }) => (
+                //aqui 321
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                  <ComboBoxResponsiveMedicoAndTutor findany={'Medico'} textAreafather={nameMedicofind} formFather={form} fieldFather={field}/>
+                    <Popover open={openMedico} onOpenChange={setOpenMedico}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={openMedico}
+                            className={cn(
+                              "w-[500px] justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            onClick={async () => {
+                              await findMedico();
+                              const storedMedicoDataItem = sessionStorage.getItem('MedicoData');
+                              if (storedMedicoDataItem !== null) {
+                                const MedicoData = JSON.parse(storedMedicoDataItem);
+                                console.log(MedicoData);
+                                setMedicoData(MedicoData); // Atualiza o estado com os dados do tutor
+                              } else {
+                                console.log('No MedicoData found in sessionStorage');
+                              }
+                            }}
+                          >
+                            {field.value
+                              ? MedicoData?.find(
+                                (medico: Medico) => medico.value === field.value
+                              )?.label
+                              : "Selecione o medico"}
+                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[500px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Pesquise o medico..." />
+                          <CommandEmpty>Nenhuma medico encontrada.</CommandEmpty>
+                          <CommandGroup style={{ maxHeight: '200px', overflowY: 'scroll' }}>
+                            {MedicoData?.map((medico: Medico) => (
+                              <CommandItem
+                                value={medico.label}
+                                key={medico.value}
+                                onSelect={() => {
+                                  form.setValue("medico", medico.value)
+                                  setOpenMedico(false)
+                                }}
+                              >
+                                <CheckIcon
+                                  className={cn(
+                                    "h-4 w-4 shrink-0",
+                                    field.value === medico.value && "text-primary"
+                                  )}
+                                />
+                                {medico.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormDescription>
                       Procure o nome do tutor
                     </FormDescription>
