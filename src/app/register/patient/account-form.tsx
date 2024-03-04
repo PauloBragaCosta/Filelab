@@ -276,6 +276,7 @@ export function AccountForm() {
     console.log(status);
   };
 
+  const [nameTutorfind, setNameTutorfind] = React.useState("")
   const [nameMedicofind, setNameMedicofind] = React.useState("")
 
 
@@ -454,7 +455,7 @@ export function AccountForm() {
                 //aqui 321
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                    <ComboBoxResponsiveMedicoAndTutor findany={'Tutor'} textAreafather={nameMedicofind} formFather={form} fieldFather={field}/>
+                    <ComboBoxResponsiveMedicoAndTutor findany={'Tutor'} textAreafather={nameTutorfind} formFather={form} fieldFather={field}/>
                     <FormDescription>
                       Procure o nome do tutor
                     </FormDescription>
@@ -466,7 +467,7 @@ export function AccountForm() {
                         <Button variant="outline">+ cadastrar</Button>
                       </AlertDialogTrigger>
                       <TutorForm onStatusChange={(newTutorName) => {
-                        setNameMedicofind(newTutorName);
+                        setNameTutorfind(newTutorName);
                       }} />
                     </AlertDialog>
                   </div>
@@ -483,9 +484,9 @@ export function AccountForm() {
               render={({ field }) => (
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                  <ComboBoxResponsiveMedicoAndTutor findany={'Medico'} textAreafather={nameMedicofind} formFather={form} fieldFather={field}/>
+                  <ComboBoxResponsiveMedicoAndTutor findany={"Medico"} textAreafather={nameMedicofind} formFather={form} fieldFather={field}/>
                     <FormDescription>
-                      Procure o nome do tutor
+                      Procure o nome do Medico
                     </FormDescription>
                     <FormMessage />
                   </div>
@@ -494,7 +495,9 @@ export function AccountForm() {
                       <AlertDialogTrigger asChild >
                         <Button variant="outline">+ cadastrar</Button>
                       </AlertDialogTrigger>
-                      <MedicoForm />
+                      <MedicoForm onStatusChange={(newMedicoName) => {
+                        setNameMedicofind(newMedicoName);
+                        }} />
                     </AlertDialog>
                   </div>
                 </FormItem>

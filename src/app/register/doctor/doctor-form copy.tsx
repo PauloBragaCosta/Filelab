@@ -42,15 +42,25 @@ const defaultValues: Partial<MedicoFormValues> = {
 }
 
 
-export function MedicoForm() {
+export function MedicoForm({
+  onStatusChange,
+}: {
+  onStatusChange: (data: any) => void
+}) {
+
+const handleStatusSelect = (data: String) => {
+  console.log(data)
+  onStatusChange(data)
+  
+};
+
   const form = useForm<MedicoFormValues>({
     mode: "all",
     defaultValues,
   });
 
   const onSubmit = async (data: MedicoFormValues) => {
-
-    console.log(data)
+    handleStatusSelect(data.nameMedico)
 
     // Ajustar o código para fazer a solicitação do servidor
     const response = await fetch(
