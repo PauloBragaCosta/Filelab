@@ -35,6 +35,7 @@ export function ComboBoxResponsiveMedicoAndTutor({
     fieldFather,
     textAreafather,
     formFather,
+    IDFather
 
 }: {
     findany: string
@@ -42,6 +43,7 @@ export function ComboBoxResponsiveMedicoAndTutor({
     fieldFather: any
     textAreafather: string
     formFather: any
+    IDFather: string
 
 }) {
 
@@ -50,6 +52,14 @@ export function ComboBoxResponsiveMedicoAndTutor({
 
 
     const [Data, setData] = useState<{ label: string, value: string }[]>([]);
+
+  const [TutorState, setTutorState] = useState<Status | null>();
+  
+  React.useEffect(() => {
+    if (TutorState) {
+        setSelectedStatus(TutorState);
+    }
+}, [TutorState]);
 
     async function find() {
         try {
@@ -91,6 +101,11 @@ export function ComboBoxResponsiveMedicoAndTutor({
                     label: post.nameTutor,
                     value: post.idTutor,
                 }));
+
+                console.log(IDFather)
+
+                const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+                setTutorState(foundTutor)
 
                 sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor

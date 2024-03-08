@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
+import { CalendarIcon, CaretSortIcon, CheckIcon, Half1Icon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -50,6 +50,7 @@ import { SparklesIcon } from "lucide-react"
 import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
 import { ComboBoxResponsiveMedicoAndTutor } from "@/components/ui/Combobox-tutor-medico"
 
+
 const especie: Status[] = [
   { label: "Equino", value: "equino" },
   { label: "Caprino", value: "caprino" },
@@ -68,16 +69,6 @@ const race: Status[] = [
   { label: "Shih Tzu", value: "shihtzu" },
   { label: "Husky Siberiano", value: "husky" },
 ] as const;
-
-type Tutor = {
-  label: string;
-  value: string;
-};
-
-type Medico = {
-  label: string;
-  value: string;
-};
 
 
 const accountFormSchema = z.object({
@@ -106,22 +97,6 @@ const accountFormSchema = z.object({
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
-
-
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  //nomeCompleto: "pacientes",
-  // dataNascimento: new Date("2023-01-23"),
-  // raca: "yorkshire",
-  //especie: "canino",
-  // sexo: "femea",
-
-}
-
-
-
-
-
 export function AccountForm() {
 
   const [openEspecie, setOpenEspecie] = React.useState(false)
@@ -129,11 +104,27 @@ export function AccountForm() {
 
 
 
-  const [TutorData, setTutorData] = useState<{ label: string, value: string }[]>([]);
-  const [openTutor, setOpenTutor] = React.useState(false)
+ 
+  const [sexoForm, setsexoForm] = useState("");
+  const [pacienteForm, setPacienteForm] = useState("")
+  const [especieState, setEspecieState] = useState<Status | null>();
+  const [idadeForm, setIdadeForm] = useState("")
+  const [racaForm, setracaForm] = useState()
+  const [raceState, setRaceState] = useState<Status | null>();
+  const [tutorIDForm, setTutorIDForm] = useState("")
 
-  const [MedicoData, setMedicoData] = useState<{ label: string, value: string }[]>([]);
-  const [openMedico, setOpenMedico] = React.useState(false)
+
+
+
+
+  // This can come from your database or API.
+  const defaultValues: Partial<AccountFormValues> = {
+    //nomeCompleto: "pacientes",
+    // dataNascimento: new Date("2023-01-23"),
+    // raca: "yorkshire",
+    //especie: "canino",
+    //sexo: sexoForm,
+  }
 
   const router = useRouter();
 
@@ -151,10 +142,91 @@ export function AccountForm() {
     }
   }, [])
 
-  const [pacienteForm, setPacienteForm] = useState("")
-  const [especieForm, setEspecieForm] = useState("")
-  const [sexoForm, setsexoForm] = useState("")
-  const [idadeForm, setIdadeForm] = useState("")
+
+
+  const [progressDescriptionPaciente, setProgressDescriptionPaciente] = useState("Digite o nome do animal");
+
+  async function findPaciente(textInput: string) {
+    const response = await fetch('http://localhost:3000/api/tasks/findPaciente', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      next: {
+        tags: ['get-tags']
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const Paciente = await response.json() as any;
+
+    // Transforma os dados para o formato desejado
+    const formattedPosts = Paciente.map((post: {
+      PacientId: number;
+      nomeCompleto: string;
+      especie: string;
+      sexo: string;
+      dataNascimento: Date;
+      raca: string;
+      createdAt: Date;
+      updatedAt: Date;
+      tutorId: string;
+      ExameDoPaciente: any[];
+      Tutor: any;
+    }) => ({
+      nomeCompleto: post.nomeCompleto,
+      PacientId: post.PacientId,
+      especie: post.especie,
+      sexo: post.sexo,
+      dataNascimento: post.dataNascimento,
+      raca: post.raca,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      tutorId: post.tutorId,
+      ExameDoPaciente: post.ExameDoPaciente,
+      Tutor: post.Tutor,
+    }));
+
+
+    // Busca o "textInput" na lista de "nomeCompleto" do paciente
+    const foundPaciente = formattedPosts.find((post: { nomeCompleto: string }) => post.nomeCompleto === textInput);
+
+
+
+    
+    console.log(foundPaciente.raca)
+    console.log(foundPaciente.sexo)
+    console.log(foundPaciente.PacientId)
+    console.log(foundPaciente.nomeCompleto)
+    console.log(foundPaciente.tutorId)
+
+    setsexoForm(foundPaciente.sexo)
+
+    const foundRace = race.find(r => r.value === foundPaciente.raca);
+    setRaceState(foundRace)
+
+    const foundEspecie = especie.find(r => r.value === foundPaciente.especie);
+    setEspecieState(foundEspecie)
+    console.log(foundEspecie)
+
+    setTutorIDForm(foundPaciente.tutorId)
+   
+
+
+    if (foundPaciente) {
+      setProgressDescriptionPaciente(`o paciente ${foundPaciente.nomeCompleto} foi encontrado no banco de dados.`);
+    } else {
+      setProgressDescriptionPaciente(`o paciente não foi encontrado no banco de dados, complete o formulario para seguir com o cadastro ${formattedPosts.label}`);
+    }
+
+    return formattedPosts;
+  }
+
+
+
 
 
 
@@ -201,72 +273,7 @@ export function AccountForm() {
 
 
 
-  async function findTutor() {
-    const response = await fetch('http://localhost:3000/api/tasks/findTutor', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      next: {
-        tags: ['get-tags']
-      }
-    });
-
-
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const Tutores = await response.json();
-
-    // Transforma os dados para o formato desejado
-    const formattedPosts = Tutores.map((post: {
-      nameTutor: any; idTutor: any
-    }) => ({
-      label: post.nameTutor,
-      value: post.idTutor,
-    }));
-
-    sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
-    setTutorData(formattedPosts); // Atualiza o estado com os dados do tutor
-
-    return formattedPosts;
-  }
-
-  async function findMedico() {
-    const response = await fetch('http://localhost:3000/api/tasks/findMedico', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      next: {
-        tags: ['get-tags']
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const Medicos = await response.json();
-
-    // Transforma os dados para o formato desejado
-    const formattedPosts = Medicos.map((post: {
-      nameMedico: any; idMedico: any
-    }) => ({
-      label: post.nameMedico,
-      value: post.idMedico,
-    }));
-
-    sessionStorage.setItem('MedicoData', JSON.stringify(formattedPosts));
-    setMedicoData(formattedPosts); // Atualiza o estado com os dados do tutor
-
-    return formattedPosts;
-  }
-
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
 
   const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 
@@ -278,6 +285,10 @@ export function AccountForm() {
 
   const [nameTutorfind, setNameTutorfind] = React.useState("")
   const [nameMedicofind, setNameMedicofind] = React.useState("")
+
+  // Adicione um estado para armazenar o progresso da conversão
+
+
 
 
   return (
@@ -307,8 +318,9 @@ export function AccountForm() {
                 <Input
                   placeholder="Nome Completo" {...field} />
               </FormControl>
+              <Button onClick={() => findPaciente(field.value)}> pesqusiar </Button>
               <FormDescription>
-                Este é o nome do animal
+                {progressDescriptionPaciente}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -326,6 +338,7 @@ export function AccountForm() {
 
                 statuses={especie}
                 texArea="especie"
+                Formfather={especieState}
                 onStatusChange={(status) => {
                   handleStatusChange(status);
                   field.onChange(status ? status.label : '');
@@ -431,6 +444,7 @@ export function AccountForm() {
               <ComboBoxResponsive
                 statuses={race}
                 texArea="raça"
+                Formfather={raceState}
                 onStatusChange={(status) => {
                   handleStatusChange(status);
                   field.onChange(status ? status.label : '');
@@ -455,7 +469,7 @@ export function AccountForm() {
                 //aqui 321
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                    <ComboBoxResponsiveMedicoAndTutor findany={'Tutor'} textAreafather={nameTutorfind} formFather={form} fieldFather={field}/>
+                    <ComboBoxResponsiveMedicoAndTutor findany={'Tutor'} textAreafather={nameTutorfind} formFather={form} fieldFather={field} IDFather={tutorIDForm}/>
                     <FormDescription>
                       Procure o nome do tutor
                     </FormDescription>
@@ -484,7 +498,7 @@ export function AccountForm() {
               render={({ field }) => (
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                  <ComboBoxResponsiveMedicoAndTutor findany={"Medico"} textAreafather={nameMedicofind} formFather={form} fieldFather={field}/>
+                    <ComboBoxResponsiveMedicoAndTutor findany={"Medico"} textAreafather={nameMedicofind} formFather={form} fieldFather={field} IDFather={tutorIDForm}/>
                     <FormDescription>
                       Procure o nome do Medico
                     </FormDescription>
@@ -497,7 +511,7 @@ export function AccountForm() {
                       </AlertDialogTrigger>
                       <MedicoForm onStatusChange={(newMedicoName) => {
                         setNameMedicofind(newMedicoName);
-                        }} />
+                      }} />
                     </AlertDialog>
                   </div>
                 </FormItem>

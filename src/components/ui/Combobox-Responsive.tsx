@@ -32,10 +32,12 @@ export type Status = {
 export function ComboBoxResponsive({
     statuses,
     texArea,
+    Formfather,
     onStatusChange,
 }: {
     statuses: Status[]
     texArea: any
+    Formfather: Status | null | undefined
     onStatusChange: (status: Status | null) => void
 }) {
 
@@ -46,7 +48,13 @@ export function ComboBoxResponsive({
     )
 
     
+    React.useEffect(() => {
+        if (Formfather) {
+            setSelectedStatus(Formfather);
+        }
+    }, [Formfather]);
 
+    
 
     const handleStatusSelect = (status: Status | null) => {
         setSelectedStatus(status);
@@ -59,7 +67,7 @@ export function ComboBoxResponsive({
         return (
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-[150px] justify-start">
+                    <Button variant="outline" className="w-[150px] justify-start text-muted-foreground">
                         {selectedStatus ? <>{selectedStatus.label}</> : <>+ Definir {texArea}</>}
                     </Button>
                 </PopoverTrigger>
@@ -80,7 +88,7 @@ export function ComboBoxResponsive({
             </DrawerTrigger>
             <DrawerContent>
                 <div className="mt-4 border-t">
-                    <StatusList setOpen={setOpen} setSelectedStatus={handleStatusSelect} statuses={statuses} textArea={texArea}/>
+                    <StatusList setOpen={setOpen} setSelectedStatus={handleStatusSelect} statuses={statuses} textArea={texArea} />
                 </div>
             </DrawerContent>
         </Drawer>
@@ -91,7 +99,8 @@ function StatusList({
     setOpen,
     setSelectedStatus,
     statuses,
-    textArea
+    textArea,
+    
 }: {
     setOpen: (open: boolean) => void
     setSelectedStatus: (status: Status | null) => void
