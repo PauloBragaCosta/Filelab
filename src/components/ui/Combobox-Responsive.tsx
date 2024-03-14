@@ -22,7 +22,6 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { useState } from "react"
 
 export type Status = {
     value: string
@@ -33,46 +32,177 @@ export function ComboBoxResponsive({
     statuses,
     texArea,
     Formfather,
+    IDFather, // esse e o valor do tutor mas vai ser levado para a raça tb quando fazer o banco de dados parecido com o do medico e tutor
     onStatusChange,
+    disabledfield
 }: {
-    statuses: Status[]
+    statuses: Status[] | null
     texArea: any
+    IDFather: string | null
     Formfather: Status | null | undefined
     onStatusChange: (status: Status | null) => void
+    disabledfield: any
 }) {
 
     const [open, setOpen] = React.useState(false)
+    const [disabledfieldany, setdisabled] = React.useState(false)
     const isDesktop = useMediaQuery("(min-width: 768px)")
     const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(
         null
     )
+    const [Data, setData] = React.useState<{ label: string, value: string }[]>([]);
 
-    
+
+    const foundTutor = Data.find((r: { value: any }) => r.value === IDFather);
+
+  
     React.useEffect(() => {
-        if (Formfather) {
-            setSelectedStatus(Formfather);
+        if (foundTutor) {
+            setSelectedStatus(foundTutor);
         }
-    }, [Formfather]);
+    }, [IDFather]);
 
-    
+    React.useEffect(() => {
+        setdisabled(disabledfield);
+
+        if (IDFather === "") {
+            setSelectedStatus(null);
+        }
+        
+    }, [IDFather]);
+
+
 
     const handleStatusSelect = (status: Status | null) => {
         setSelectedStatus(status);
         onStatusChange(status);
     };
-    
+
+    const [TutorState, setTutorState] = React.useState<Status | null>();
+
+
+    React.useEffect(() => {
+        if (TutorState) {
+            setSelectedStatus(TutorState);
+        }
+    }, [TutorState]);
+
+    React.useEffect(() => {
+        find()
+    }, []);
+
+   
+
+
+    async function find() {
+        try {
+            const response = await fetch(`http://localhost:3000/api/tasks/find${texArea}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                next: {
+                    tags: ['get-tags']
+                }
+            });
+
+            if (texArea === 'especie') {
+                const Tutores = await response.json();
+
+                // Transforma os dados para o formato desejado
+                const formattedPosts = Tutores.map((post: {
+                    label: any; value: any
+                }) => ({
+                    label: post.label,
+                    value: post.value,
+                }));
+
+                const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+
+                setData(formattedPosts); // Atualiza o estado com os dados do tutor
+
+
+                return formattedPosts;
+            }
+
+            if (texArea === 'raca') {
+                const Tutores = await response.json();
+                // Transforma os dados para o formato desejado
+                const formattedPosts = Tutores.map((post: {
+                    label: any; value: any
+                }) => ({
+                    label: post.label,
+                    value: post.value,
+                }));
+
+                const foundRaça = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+
+                console.log(foundRaça)
+
+
+                setData(formattedPosts); // Atualiza o estado com os dados do tutor
+
+                return formattedPosts;
+            }
+
+            if (texArea === 'medico') {
+                const Medicos = await response.json();
+
+                // Transforma os dados para o formato desejado
+                const formattedPosts = Medicos.map((post: {
+                    nameMedico: any; idMedico: any
+                }) => ({
+                    label: post.nameMedico,
+                    value: post.idMedico,
+                }));
+
+
+                sessionStorage.setItem('MedicoData', JSON.stringify(formattedPosts));
+                setData(formattedPosts); // Atualiza o estado com os dados do tutor
+
+                return formattedPosts;
+            }
+
+
+            else if (texArea === 'tutor') {
+                const Tutores = await response.json();
+
+                // Transforma os dados para o formato desejado
+                const formattedPosts = Tutores.map((post: {
+                    nameTutor: any; idTutor: any
+                }) => ({
+                    label: post.nameTutor,
+                    value: post.idTutor,
+                }));
+
+
+                const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+                setTutorState(foundTutor)
+
+
+                sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
+                setData(formattedPosts); // Atualiza o estado com os dados do tutor
+
+                return formattedPosts;
+            }
+
+        } catch (error) {
+            console.error("An error occurred while fetching data:", error);
+        }
+    }
+
 
 
     if (isDesktop) {
         return (
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-[150px] justify-start text-muted-foreground">
-                        {selectedStatus ? <>{selectedStatus.label}</> : <>+ Definir {texArea}</>}
+                    <Button disabled={disabledfieldany} variant="outline" className="w-[240px] justify-start text-muted-foreground">
+                        {selectedStatus ? <>{selectedStatus.label}</> : <>+ Selecione o {texArea}</>}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0" align="start">
-                    <StatusList setOpen={setOpen} setSelectedStatus={handleStatusSelect} statuses={statuses} textArea={texArea}/>
+                    <StatusList setOpen={setOpen} setSelectedStatus={handleStatusSelect} statuses={Data} textArea={texArea} />
 
                 </PopoverContent>
             </Popover>
@@ -82,13 +212,13 @@ export function ComboBoxResponsive({
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button variant="outline" className="w-[150px] justify-start">
-                    {selectedStatus ? <>{selectedStatus.label}</> : <>+ Definir {texArea}</>}
+                <Button disabled={disabledfieldany} variant="outline" className="w-[240px] justify-start">
+                    {selectedStatus ? <>{selectedStatus.label}</> : <>+ Selecione o {texArea}</>}
                 </Button>
             </DrawerTrigger>
             <DrawerContent>
                 <div className="mt-4 border-t">
-                    <StatusList setOpen={setOpen} setSelectedStatus={handleStatusSelect} statuses={statuses} textArea={texArea} />
+                    <StatusList setOpen={setOpen} setSelectedStatus={handleStatusSelect} statuses={Data} textArea={texArea} />
                 </div>
             </DrawerContent>
         </Drawer>
@@ -100,18 +230,23 @@ function StatusList({
     setSelectedStatus,
     statuses,
     textArea,
-    
+
 }: {
     setOpen: (open: boolean) => void
     setSelectedStatus: (status: Status | null) => void
     statuses: Status[]
     textArea: string
 }) {
+
+    React.useEffect(() => {
+
+        console.log(textArea)
+    });
     return (
         <Command>
             <CommandInput placeholder={`Filtrar ${textArea}...`} />
             <CommandList>
-                <CommandEmpty>Nenhum resultado encontrado</CommandEmpty>
+                <CommandEmpty>Nenhum {textArea} encontrado</CommandEmpty>
                 <CommandGroup>
                     {statuses.map((statusItem) => (
                         <CommandItem

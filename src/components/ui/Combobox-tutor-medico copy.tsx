@@ -56,10 +56,13 @@ export function ComboBoxResponsiveMedicoAndTutor({
   const [TutorState, setTutorState] = useState<Status | null>();
   
   React.useEffect(() => {
-    if (TutorState) {
-        setSelectedStatus(TutorState);
-    }
-}, [TutorState]);
+    find()
+}, []);
+
+React.useEffect(() => {
+    getButtonLabel();
+}, [IDFather]);
+
 
     async function find() {
         try {
@@ -107,6 +110,9 @@ export function ComboBoxResponsiveMedicoAndTutor({
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
                 setTutorState(foundTutor)
 
+                console.log(foundTutor)
+
+
                 sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor
 
@@ -135,6 +141,11 @@ export function ComboBoxResponsiveMedicoAndTutor({
                 );
                 return selectedTutor?.label;
             }
+
+            if (TutorState) {
+                return `${TutorState.label}`;
+            }
+           
             return "Selecione o tutor";
         }
     }
@@ -191,7 +202,7 @@ export function ComboBoxResponsiveMedicoAndTutor({
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[500px] p-0" align="start">
-                    <StatusList nameArea={textAreafather} textArea={findany} setOpenSon={setOpen} dataSon={Data} formSon={formFather} fieldSon={fieldFather} />
+                    <StatusList nameArea={textAreafather} textArea={findany} setOpenSon={setOpen} dataSon={Data} formSon={formFather} fieldSon={fieldFather} TutorStateSon={TutorState}/>
 
                 </PopoverContent>
             </Popover>
@@ -217,7 +228,7 @@ export function ComboBoxResponsiveMedicoAndTutor({
             </DrawerTrigger>
             <DrawerContent>
                 <div className="mt-4 border-t">
-                    <StatusList nameArea={textAreafather} textArea={findany} setOpenSon={setOpen} dataSon={Data} formSon={formFather} fieldSon={fieldFather} />
+                    <StatusList nameArea={textAreafather} textArea={findany} setOpenSon={setOpen} dataSon={Data} formSon={formFather} fieldSon={fieldFather} TutorStateSon={TutorState}/>
                 </div>
             </DrawerContent>
         </Drawer>
@@ -231,6 +242,7 @@ function StatusList({
     dataSon,
     formSon,
     fieldSon,
+    TutorStateSon,
 }: {
 
     nameArea: string
@@ -239,6 +251,7 @@ function StatusList({
     dataSon: any
     formSon: any
     fieldSon: any
+    TutorStateSon: any
 }) {
 
     function renderCommandItems() {

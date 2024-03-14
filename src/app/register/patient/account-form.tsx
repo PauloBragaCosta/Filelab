@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon, CaretSortIcon, CheckIcon, Half1Icon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -10,13 +9,6 @@ import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils"
 import { Button } from "../../../components/ui/button"
 import { Calendar } from "../../../components/ui/calendar"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "../../../components/ui/command"
 import {
   Form,
   FormControl,
@@ -27,7 +19,6 @@ import {
   FormMessage,
 } from "../../../components/ui/form"
 
-import { Input } from "../../../components/ui/input"
 import {
   Popover,
   PopoverContent,
@@ -40,15 +31,29 @@ import {
   CardTitle,
 } from "../../../components/ui/card"
 
+import {
+  CalendarIcon,
+  PersonIcon,
+} from "@radix-ui/react-icons"
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../../../components/ui/command"
+
 import { toast } from "../../../components/ui/use-toast"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { TutorForm } from "../tutor/tutor-form copy"
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import React, { useEffect, useState } from 'react';
 import { MedicoForm } from "../doctor/doctor-form copy"
-import { SparklesIcon } from "lucide-react"
 import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
-import { ComboBoxResponsiveMedicoAndTutor } from "@/components/ui/Combobox-tutor-medico"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 const especie: Status[] = [
@@ -56,18 +61,6 @@ const especie: Status[] = [
   { label: "Caprino", value: "caprino" },
   { label: "Canino", value: "canino" },
   { label: "Felino", value: "felino" },
-] as const;
-
-const race: Status[] = [
-  { label: "Labrador Retriever", value: "labrador" },
-  { label: "Bulldog Francês", value: "bulldog_frances" },
-  { label: "Poodle", value: "poodle" },
-  { label: "Beagle", value: "beagle" },
-  { label: "Rottweiler", value: "rottweiler" },
-  { label: "Yorkshire Terrier", value: "yorkshire" },
-  { label: "Dachshund", value: "dachshund" },
-  { label: "Shih Tzu", value: "shihtzu" },
-  { label: "Husky Siberiano", value: "husky" },
 ] as const;
 
 
@@ -104,14 +97,35 @@ export function AccountForm() {
 
 
 
- 
+
   const [sexoForm, setsexoForm] = useState("");
+
   const [pacienteForm, setPacienteForm] = useState("")
   const [especieState, setEspecieState] = useState<Status | null>();
   const [idadeForm, setIdadeForm] = useState("")
-  const [racaForm, setracaForm] = useState()
-  const [raceState, setRaceState] = useState<Status | null>();
+  const [especieForm, setEspecieForm] = useState("")
+  const [racaForm, setracaForm] = useState("")
+  // const [tutorState, setTutorState] = useState<Status | null>(); não vai dar certo pois todos precisam ser o Value ID
+
   const [tutorIDForm, setTutorIDForm] = useState("")
+
+  const [dataPaciente, setDataPaciente] = useState<{
+    PacientId: number;
+    nomeCompleto: string;
+    especieValue: string;
+    sexoValue: string;
+    dataNascimento: Date;
+    racaValue: string;
+    createdAt: Date;
+    updatedAt: Date;
+    tutorId: string;
+    ExameDoPaciente: any[];
+    Tutor: any;
+    Raca: any;
+    sexo: any;
+    Especie: any;
+  }[]>([]);
+
 
 
 
@@ -140,6 +154,8 @@ export function AccountForm() {
     if (pacienteSON) {
       setIAForm(true);
     }
+
+    findPaciente("");
   }, [])
 
 
@@ -157,9 +173,6 @@ export function AccountForm() {
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
 
     const Paciente = await response.json() as any;
 
@@ -167,60 +180,36 @@ export function AccountForm() {
     const formattedPosts = Paciente.map((post: {
       PacientId: number;
       nomeCompleto: string;
-      especie: string;
-      sexo: string;
+      especieValue: string;
+      sexoValue: string;
       dataNascimento: Date;
-      raca: string;
+      racaValue: string;
       createdAt: Date;
       updatedAt: Date;
       tutorId: string;
       ExameDoPaciente: any[];
       Tutor: any;
+      Raca: any;
+      sexo: any;
+      Especie: any;
     }) => ({
       nomeCompleto: post.nomeCompleto,
       PacientId: post.PacientId,
-      especie: post.especie,
-      sexo: post.sexo,
+      especieValue: post.especieValue,
+      sexoValue: post.sexoValue,
       dataNascimento: post.dataNascimento,
-      raca: post.raca,
+      racaValue: post.racaValue,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       tutorId: post.tutorId,
       ExameDoPaciente: post.ExameDoPaciente,
       Tutor: post.Tutor,
+      Raca: post.Raca,
+      sexo: post.sexo,
+      Especie: post.Especie,
     }));
 
-
-    // Busca o "textInput" na lista de "nomeCompleto" do paciente
-    const foundPaciente = formattedPosts.find((post: { nomeCompleto: string }) => post.nomeCompleto === textInput);
-
-
-
-    
-    console.log(foundPaciente.raca)
-    console.log(foundPaciente.sexo)
-    console.log(foundPaciente.PacientId)
-    console.log(foundPaciente.nomeCompleto)
-    console.log(foundPaciente.tutorId)
-
-    setsexoForm(foundPaciente.sexo)
-
-    const foundRace = race.find(r => r.value === foundPaciente.raca);
-    setRaceState(foundRace)
-
-    const foundEspecie = especie.find(r => r.value === foundPaciente.especie);
-    setEspecieState(foundEspecie)
-    console.log(foundEspecie)
-
-    setTutorIDForm(foundPaciente.tutorId)
-   
-
-
-    if (foundPaciente) {
-      setProgressDescriptionPaciente(`o paciente ${foundPaciente.nomeCompleto} foi encontrado no banco de dados.`);
-    } else {
-      setProgressDescriptionPaciente(`o paciente não foi encontrado no banco de dados, complete o formulario para seguir com o cadastro ${formattedPosts.label}`);
-    }
+    setDataPaciente(formattedPosts)
 
     return formattedPosts;
   }
@@ -272,8 +261,9 @@ export function AccountForm() {
   }
 
 
-
   const [open, setOpen] = React.useState(false)
+
+  const [disabledfield, setdisabled] = React.useState(false)
 
   const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
 
@@ -288,6 +278,14 @@ export function AccountForm() {
 
   // Adicione um estado para armazenar o progresso da conversão
 
+
+  React.useEffect(() => {
+    form.reset();
+  }, [tutorIDForm]);
+
+  React.useEffect(() => {
+    form.reset();
+  }, [disabledfield]);
 
 
 
@@ -315,17 +313,59 @@ export function AccountForm() {
             <FormItem>
               <FormLabel>Paciente</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Nome Completo" {...field} />
+                <Command className="rounded-lg border shadow-md h-35">
+                  <div className="flex">
+                    <CommandInput className="flex-auto w-full" placeholder="Digite ou pesquise o nome do animal..." {...field} onClick={() => form.reset()} />
+                    <div className="border-b">
+                      <Badge className="flex-none my-3 mr-4" onClick={() => field.onChange('')} variant="destructive">apagar</Badge>
+
+                    </div>
+                  </div>
+                  <CommandList>
+                    <CommandEmpty>
+                      <h1>Não foram encontrados pacientes com esse mesmo nome.</h1>
+                      <Badge className="flex-none my-3 mr-4" onClick={() => {setdisabled(false); setEspecieForm(""); setsexoForm(""); setracaForm(""); setTutorIDForm("") }}>Cadastrar</Badge>
+
+                    </CommandEmpty>
+                    <ScrollArea className="w-full rounded-md border">
+                      <CommandGroup heading="Nomes encontrados no sistema">
+                        {dataPaciente.map((statusItem) => (
+                          <CommandItem
+                            key={statusItem.PacientId}
+                            value={statusItem.nomeCompleto}
+                            onSelect={(value) => {
+                              field.onChange(value);
+
+                              setEspecieForm(statusItem.especieValue);
+
+
+                              setsexoForm(statusItem.sexoValue);
+
+                              setracaForm(statusItem.racaValue);
+
+                              setTutorIDForm(statusItem.tutorId);
+
+                              setdisabled(true)
+
+
+                            }}
+                          >
+                            <PersonIcon className="mr-2 h-4 w-4" />
+                            <span>Nº {statusItem.PacientId} - {statusItem.nomeCompleto}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </ScrollArea>
+                  </CommandList>
+                </Command>
               </FormControl>
-              <Button onClick={() => findPaciente(field.value)}> pesqusiar </Button>
-              <FormDescription>
-                {progressDescriptionPaciente}
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
+
+
 
 
         <FormField
@@ -335,15 +375,17 @@ export function AccountForm() {
             <FormItem className="flex flex-col">
               <FormLabel>Selecione a especie do animal</FormLabel>
               <ComboBoxResponsive
-
-                statuses={especie}
+                statuses={null}
                 texArea="especie"
-                Formfather={especieState}
+                IDFather={especieForm}
+                Formfather={null}
                 onStatusChange={(status) => {
                   handleStatusChange(status);
                   field.onChange(status ? status.label : '');
                 }}
+                disabledfield={disabledfield}
               />
+
               <FormDescription>
                 Selecione a especie do animal.
               </FormDescription>
@@ -368,7 +410,7 @@ export function AccountForm() {
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="Macho" />
+                      <RadioGroupItem value="Macho" disabled={disabledfield}/>
                     </FormControl>
                     <FormLabel className="font-normal">
                       Macho
@@ -376,7 +418,7 @@ export function AccountForm() {
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="Fêmea" />
+                      <RadioGroupItem value="Femea" disabled={disabledfield}/>
                     </FormControl>
                     <FormLabel className="font-normal">
                       Fêmea
@@ -442,13 +484,15 @@ export function AccountForm() {
             <FormItem className="flex flex-col">
               <FormLabel>Selecione a raça do animal</FormLabel>
               <ComboBoxResponsive
-                statuses={race}
-                texArea="raça"
-                Formfather={raceState}
+                statuses={null}
+                texArea="raca"
+                IDFather={racaForm}
+                Formfather={null}
                 onStatusChange={(status) => {
                   handleStatusChange(status);
                   field.onChange(status ? status.label : '');
                 }}
+                disabledfield={disabledfield}
               />
               <FormDescription>
                 Selecione a raça do animal.
@@ -469,7 +513,17 @@ export function AccountForm() {
                 //aqui 321
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                    <ComboBoxResponsiveMedicoAndTutor findany={'Tutor'} textAreafather={nameTutorfind} formFather={form} fieldFather={field} IDFather={tutorIDForm}/>
+                    <ComboBoxResponsive
+                      statuses={null}
+                      texArea="tutor"
+                      IDFather={tutorIDForm} // esse e o valor do tutor mas vai ser levado para a raça tb quando fazer o banco de dados parecido com o do medico e tutor
+                      Formfather={null}
+                      onStatusChange={(status) => {
+                        handleStatusChange(status);
+                        field.onChange(status ? status.label : '');
+                      }}
+                      disabledfield={disabledfield}
+                    />
                     <FormDescription>
                       Procure o nome do tutor
                     </FormDescription>
@@ -498,7 +552,17 @@ export function AccountForm() {
               render={({ field }) => (
                 <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
                   <div className="flex flex-col">
-                    <ComboBoxResponsiveMedicoAndTutor findany={"Medico"} textAreafather={nameMedicofind} formFather={form} fieldFather={field} IDFather={tutorIDForm}/>
+                    <ComboBoxResponsive
+                      statuses={null}
+                      texArea="medico"
+                      IDFather={null}
+                      Formfather={null}
+                      onStatusChange={(status) => {
+                        handleStatusChange(status);
+                        field.onChange(status ? status.label : '');
+                      }}
+                      disabledfield={disabledfield}
+                    />
                     <FormDescription>
                       Procure o nome do Medico
                     </FormDescription>

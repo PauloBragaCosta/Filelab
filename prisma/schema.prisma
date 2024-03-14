@@ -14,15 +14,36 @@ datasource db {
 model Paciente {
   PacientId       Int      @id @default(autoincrement())
   nomeCompleto    String
-  especie         String
-  sexo            String
+  especieValue    String?
+  sexoValue       String?
   dataNascimento  DateTime
-  raca            String
+  racaValue       String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   tutorId         String?
   ExameDoPaciente Exame[]
   Tutor           Tutor?   @relation(fields: [tutorId], references: [idTutor])
+  Raca            Raca?    @relation(fields: [racaValue], references: [value])
+  Sexo            Sexo?    @relation(fields: [sexoValue], references: [value])
+  Especie         Especie? @relation(fields: [especieValue], references: [value])
+}
+
+model Especie {
+  value         String     @id @default(uuid())
+  label         String?
+  PacientesSexo Paciente[]
+}
+
+model Sexo {
+  value         String     @id @default(uuid())
+  label         String?
+  PacientesRaca Paciente[]
+}
+
+model Raca {
+  value         String     @id @default(uuid())
+  label         String?
+  PacientesRaca Paciente[]
 }
 
 model Tutor {
@@ -56,8 +77,8 @@ model Exame {
   observation       String? // Observação (histórico, sinais clínicos, tratamento submetido)
   DateTimeColeta    DateTime? // Data de coleta
   exameTipo         String? // Tipo de exame (anatomia patológica, citopatologia, análise líquidos, análise hematológica, análise bioquímica)
-  IdPaciente        Int?   @unique
+  IdPaciente        Int?      @unique
   medicoId          String?
-  Paciente             Paciente? @relation(fields: [IdPaciente], references: [PacientId])
+  Paciente          Paciente? @relation(fields: [IdPaciente], references: [PacientId])
   Medico            Medico?   @relation(fields: [medicoId], references: [idMedico])
 }
