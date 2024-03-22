@@ -65,11 +65,11 @@ export function ComboBoxResponsive({
     React.useEffect(() => {
         setdisabled(disabledfield);
 
-        if (IDFather === "") {
-            setSelectedStatus(null);
+        if (IDFather === "invalido") {
+        setdisabled(false);
         }
         
-    }, [IDFather]);
+    }, [disabledfield]);
 
 
 

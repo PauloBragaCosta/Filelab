@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
+import { format, set } from "date-fns"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useRouter } from 'next/navigation';
@@ -54,6 +54,14 @@ import { MedicoForm } from "../doctor/doctor-form copy"
 import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { TabsCalendario } from "@/components/ui/TabsCalendario"
+import * as Accordion from '@radix-ui/react-accordion';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from "@/components/ui/select"
+import { SelectTrigger } from "@radix-ui/react-select"
+import { Input } from "@/components/ui/input"
+import { PrismaClient } from '@prisma/client'
+
+
 
 
 const especie: Status[] = [
@@ -92,22 +100,18 @@ type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
 
-  const [openEspecie, setOpenEspecie] = React.useState(false)
-  const [openRaca, setOpenRaca] = React.useState(false)
-
-
-
-
   const [sexoForm, setsexoForm] = useState("");
-
   const [pacienteForm, setPacienteForm] = useState("")
   const [especieState, setEspecieState] = useState<Status | null>();
   const [idadeForm, setIdadeForm] = useState("")
   const [especieForm, setEspecieForm] = useState("")
+  const [DataForm, setDataForm] = useState<Date>()
   const [racaForm, setracaForm] = useState("")
   // const [tutorState, setTutorState] = useState<Status | null>(); não vai dar certo pois todos precisam ser o Value ID
 
   const [tutorIDForm, setTutorIDForm] = useState("")
+  const [MedicoIDForm, setMedicoIDForm] = useState("")
+
 
   const [dataPaciente, setDataPaciente] = useState<{
     PacientId: number;
@@ -155,14 +159,13 @@ export function AccountForm() {
       setIAForm(true);
     }
 
-    findPaciente("");
+    findPaciente();
   }, [])
 
 
 
-  const [progressDescriptionPaciente, setProgressDescriptionPaciente] = useState("Digite o nome do animal");
+  async function findPaciente() {
 
-  async function findPaciente(textInput: string) {
     const response = await fetch('http://localhost:3000/api/tasks/findPaciente', {
       method: 'GET',
       headers: {
@@ -176,7 +179,7 @@ export function AccountForm() {
 
     const Paciente = await response.json() as any;
 
-    // Transforma os dados para o formato desejado
+    //Transforma os dados para o formato desejado
     const formattedPosts = Paciente.map((post: {
       PacientId: number;
       nomeCompleto: string;
@@ -211,7 +214,6 @@ export function AccountForm() {
 
     setDataPaciente(formattedPosts)
 
-    return formattedPosts;
   }
 
 
@@ -261,31 +263,40 @@ export function AccountForm() {
   }
 
 
-  const [open, setOpen] = React.useState(false)
 
-  const [disabledfield, setdisabled] = React.useState(false)
+  const [disabledfield, setdisabled] = React.useState(true)
 
-  const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
-
-  const handleStatusChange = (status: Status | null) => {
-    setSelectedStatus(status);
-    // Aqui você pode adicionar o código para lidar com a mudança de status
-    console.log(status);
-  };
 
   const [nameTutorfind, setNameTutorfind] = React.useState("")
   const [nameMedicofind, setNameMedicofind] = React.useState("")
 
-  // Adicione um estado para armazenar o progresso da conversão
+
+  const handleValueChange = (value: string) => {
+    setPacienteForm(value);
+  };
 
 
-  React.useEffect(() => {
-    form.reset();
-  }, [tutorIDForm]);
+  async function Dataformat(event: Date) {
+    console.log(event);
 
-  React.useEffect(() => {
-    form.reset();
-  }, [disabledfield]);
+    var { zonedTimeToUtc, format } = require('date-fns-tz'); // requer a biblioteca date-fns-tz.js
+
+    function convertIsoToReadable(isoString: Date) {
+      // Converte a string ISO para um objeto Date
+      var date = zonedTimeToUtc(isoString, 'Etc/UTC');
+
+      // Formata a data no formato desejado
+      var formattedDate = format(date, "EEE MMM dd yyyy HH:mm:ss 'GMT'xx '(Horário Padrão de Brasília)'", { timeZone: 'America/Sao_Paulo' });
+
+      return formattedDate.replace(/GMT\+(\d{2})(\d{2})/, 'GMT-$1$2');
+    }
+
+    console.log(convertIsoToReadable(event));
+    // setDataForm(convertIsoToReadable(event));
+
+
+
+  }
 
 
 
@@ -303,7 +314,11 @@ export function AccountForm() {
         </div>
       } */}
 
+
+
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+
 
 
         <FormField
@@ -314,19 +329,47 @@ export function AccountForm() {
               <FormLabel>Paciente</FormLabel>
               <FormControl>
                 <Command className="rounded-lg border shadow-md h-35">
+
                   <div className="flex">
-                    <CommandInput className="flex-auto w-full" placeholder="Digite ou pesquise o nome do animal..." {...field} onClick={() => form.reset()} />
+                    <CommandInput placeholder="Digite ou pesquise o nome do animal..." value={pacienteForm} onValueChange={handleValueChange} />
                     <div className="border-b">
-                      <Badge className="flex-none my-3 mr-4" onClick={() => field.onChange('')} variant="destructive">apagar</Badge>
+                      <Button variant="ghost" className="flex-none my-3 mr-4" onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        field.onChange('');
+                        setdisabled(true);
+                        setPacienteForm('');
+                        setEspecieForm("");
+                        setsexoForm("");
+                        setracaForm("");
+                        setTutorIDForm("");
+                        setMedicoIDForm("");
+                        setDataForm(undefined)
+
+                      }}>apagar</Button>
+
 
                     </div>
                   </div>
+
                   <CommandList>
                     <CommandEmpty>
                       <h1>Não foram encontrados pacientes com esse mesmo nome.</h1>
-                      <Badge className="flex-none my-3 mr-4" onClick={() => {setdisabled(false); setEspecieForm(""); setsexoForm(""); setracaForm(""); setTutorIDForm("") }}>Cadastrar</Badge>
+                      <Button variant="ghost" className="flex-none my-3 mr-4" onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setdisabled(false);
+                        setEspecieForm("");
+                        setsexoForm("");
+                        setracaForm("");
+                        setTutorIDForm("");
+                        setMedicoIDForm("");
+                        setDataForm(undefined);
+                        field.onChange(pacienteForm);
 
+                      }}>Cadastrar</Button>
                     </CommandEmpty>
+
                     <ScrollArea className="w-full rounded-md border">
                       <CommandGroup heading="Nomes encontrados no sistema">
                         {dataPaciente.map((statusItem) => (
@@ -334,7 +377,10 @@ export function AccountForm() {
                             key={statusItem.PacientId}
                             value={statusItem.nomeCompleto}
                             onSelect={(value) => {
-                              field.onChange(value);
+                              // Atualize o valor do campo de entrada
+                              field.onChange(value)
+                              // Verifique se o valor do campo de entrada foi atualizado
+                              setPacienteForm(value);
 
                               setEspecieForm(statusItem.especieValue);
 
@@ -344,9 +390,16 @@ export function AccountForm() {
                               setracaForm(statusItem.racaValue);
 
                               setTutorIDForm(statusItem.tutorId);
+                              setMedicoIDForm("invalido");
 
-                              setdisabled(true)
 
+                              Dataformat(statusItem.dataNascimento)
+                              setDataForm(statusItem.dataNascimento)
+
+
+                              console.log(statusItem.dataNascimento);
+
+                              setdisabled(true);
 
                             }}
                           >
@@ -380,8 +433,7 @@ export function AccountForm() {
                 IDFather={especieForm}
                 Formfather={null}
                 onStatusChange={(status) => {
-                  handleStatusChange(status);
-                  field.onChange(status ? status.label : '');
+                  field.onChange(status ? status.value : '');
                 }}
                 disabledfield={disabledfield}
               />
@@ -410,7 +462,7 @@ export function AccountForm() {
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="Macho" disabled={disabledfield}/>
+                      <RadioGroupItem value="Macho" disabled={disabledfield} />
                     </FormControl>
                     <FormLabel className="font-normal">
                       Macho
@@ -418,7 +470,7 @@ export function AccountForm() {
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="Femea" disabled={disabledfield}/>
+                      <RadioGroupItem value="Femea" disabled={disabledfield} />
                     </FormControl>
                     <FormLabel className="font-normal">
                       Fêmea
@@ -437,40 +489,13 @@ export function AccountForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Idade Anos Meses</FormLabel>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      aria-expanded={open}
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Escolha uma data</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <TabsCalendario
+                IDFather={DataForm}
+                onStatusChange={(status) => {
+                  field.onChange(status ? status : '');
+                }} />
               <FormDescription>
-                A data de nascimento é usada para calcular a idade do animal.
+
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -489,8 +514,7 @@ export function AccountForm() {
                 IDFather={racaForm}
                 Formfather={null}
                 onStatusChange={(status) => {
-                  handleStatusChange(status);
-                  field.onChange(status ? status.label : '');
+                  field.onChange(status ? status.value : '');
                 }}
                 disabledfield={disabledfield}
               />
@@ -519,8 +543,7 @@ export function AccountForm() {
                       IDFather={tutorIDForm} // esse e o valor do tutor mas vai ser levado para a raça tb quando fazer o banco de dados parecido com o do medico e tutor
                       Formfather={null}
                       onStatusChange={(status) => {
-                        handleStatusChange(status);
-                        field.onChange(status ? status.label : '');
+                        field.onChange(status ? status.value : '');
                       }}
                       disabledfield={disabledfield}
                     />
@@ -555,11 +578,10 @@ export function AccountForm() {
                     <ComboBoxResponsive
                       statuses={null}
                       texArea="medico"
-                      IDFather={null}
+                      IDFather={MedicoIDForm}
                       Formfather={null}
                       onStatusChange={(status) => {
-                        handleStatusChange(status);
-                        field.onChange(status ? status.label : '');
+                        field.onChange(status ? status.value : '');
                       }}
                       disabledfield={disabledfield}
                     />
