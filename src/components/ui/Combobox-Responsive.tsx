@@ -106,45 +106,6 @@ export function ComboBoxResponsive({
                 }
             });
 
-            if (texArea === 'especie') {
-                const Tutores = await response.json();
-
-                // Transforma os dados para o formato desejado
-                const formattedPosts = Tutores.map((post: {
-                    label: any; value: any
-                }) => ({
-                    label: post.label,
-                    value: post.value,
-                }));
-
-                const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
-
-                setData(formattedPosts); // Atualiza o estado com os dados do tutor
-
-
-                return formattedPosts;
-            }
-
-            if (texArea === 'raca') {
-                const Tutores = await response.json();
-                // Transforma os dados para o formato desejado
-                const formattedPosts = Tutores.map((post: {
-                    label: any; value: any
-                }) => ({
-                    label: post.label,
-                    value: post.value,
-                }));
-
-                const foundRaça = formattedPosts.find((r: { value: any }) => r.value === IDFather);
-
-                console.log(foundRaça)
-
-
-                setData(formattedPosts); // Atualiza o estado com os dados do tutor
-
-                return formattedPosts;
-            }
-
             if (texArea === 'medico') {
                 const Medicos = await response.json();
 
@@ -164,7 +125,7 @@ export function ComboBoxResponsive({
             }
 
 
-            else if (texArea === 'tutor') {
+            if (texArea === 'tutor') {
                 const Tutores = await response.json();
 
                 // Transforma os dados para o formato desejado
@@ -181,6 +142,26 @@ export function ComboBoxResponsive({
 
 
                 sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
+                setData(formattedPosts); // Atualiza o estado com os dados do tutor
+
+                return formattedPosts;
+            }
+
+            else if (texArea) {
+                const Tutores = await response.json();
+                // Transforma os dados para o formato desejado
+                const formattedPosts = Tutores.map((post: {
+                    label: any; value: any
+                }) => ({
+                    label: post.label,
+                    value: post.value,
+                }));
+
+                const foundRaça = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+
+                console.log(foundRaça)
+
+
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor
 
                 return formattedPosts;

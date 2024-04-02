@@ -2,6 +2,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PythonShell } from 'python-shell';
 
+
+
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.log("ate aqui tudo certo 1")
     const texto = JSON.stringify(req.body)

@@ -21,7 +21,7 @@ model Paciente {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   tutorId         String?
-  ExameDoPaciente Exame[]
+  ExameDoPaciente OriginExam[]
   Tutor           Tutor?   @relation(fields: [tutorId], references: [idTutor])
   Raca            Raca?    @relation(fields: [racaValue], references: [value])
   Sexo            Sexo?    @relation(fields: [sexoValue], references: [value])
@@ -37,7 +37,7 @@ model Especie {
 model Sexo {
   value         String     @id @default(uuid())
   label         String?
-  PacientesRaca Paciente[]
+  PacientesSexo Paciente[]
 }
 
 model Raca {
@@ -66,19 +66,35 @@ model Medico {
   comunicacaoEmailsMedico   Boolean // Indica se o usuário deseja receber e-mails sobre o diagnóstico do pet
   marketingEmailsMedico     Boolean // Indica se o usuário deseja receber e-mails sobre novos produtos, recursos e muito mais
   comunicacaoWhatsappMedico Boolean // Indica se o usuário deseja receber notificações por Whatsapp sobre o diagnóstico do pet
-  examedoMedico             Exame[]
+  examedoMedico             OriginExam[]
 }
 
-model Exame {
+
+
+model Storage {
+  value   String  @id @default(uuid())
+  label   String?
+  idExame OriginExam[]
+}
+
+model ExamType {
+  value   String  @id @default(uuid())
+  label   String?
+  idExame OriginExam[]
+}
+
+model OriginExam {
   idExame           Int       @id @default(autoincrement())
-  amostra           String? // Tipo de amostra enviada (tubo, pote, lâmina, outros)
-  amostraType       String[] // Quantidade de frascos
+  storageValue      String? // Tipo de amostra enviada (tubo, pote, lâmina, outros)
+  storageQuantity   String? // Quantidade de frascos
   clinicalSuspicion String? // Suspeita clínica
   observation       String? // Observação (histórico, sinais clínicos, tratamento submetido)
   DateTimeColeta    DateTime? // Data de coleta
   exameTipo         String? // Tipo de exame (anatomia patológica, citopatologia, análise líquidos, análise hematológica, análise bioquímica)
-  IdPaciente        Int?      @unique
+  IdPaciente        Int?
   medicoId          String?
   Paciente          Paciente? @relation(fields: [IdPaciente], references: [PacientId])
   Medico            Medico?   @relation(fields: [medicoId], references: [idMedico])
+  Storage           Storage?  @relation(fields: [storageValue], references: [value])
+  ExamType          ExamType? @relation(fields: [exameTipo], references: [value])
 }

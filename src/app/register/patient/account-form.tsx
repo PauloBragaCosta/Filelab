@@ -102,15 +102,20 @@ export function AccountForm() {
 
   const [sexoForm, setsexoForm] = useState("");
   const [pacienteForm, setPacienteForm] = useState("")
-  const [especieState, setEspecieState] = useState<Status | null>();
-  const [idadeForm, setIdadeForm] = useState("")
+
+  const [nameMedicofind, setNameMedicofind] = React.useState<string | undefined>("")
+  const [MedicoIDForm, setMedicoIDForm] = useState< string | undefined>("")
+
+
   const [especieForm, setEspecieForm] = useState("")
   const [DataForm, setDataForm] = useState<Date>()
   const [racaForm, setracaForm] = useState("")
   // const [tutorState, setTutorState] = useState<Status | null>(); não vai dar certo pois todos precisam ser o Value ID
 
   const [tutorIDForm, setTutorIDForm] = useState("")
-  const [MedicoIDForm, setMedicoIDForm] = useState("")
+  const [nameTutorfind, setNameTutorfind] = React.useState<string | undefined>("")
+
+  const [isVisible, setIsVisible] = useState(false);
 
 
   const [dataPaciente, setDataPaciente] = useState<{
@@ -217,39 +222,40 @@ export function AccountForm() {
   }
 
 
-
-
-
+  const [pacientIdForm, setPacientIdForm] = useState(0)
 
 
 
   async function onSubmit(data: AccountFormValues) {
-    console.log(data);
+    if (pacientIdForm === 0) {
+      // Armazene os dados do paciente no localStorage
+      sessionStorage.setItem('pacienteData', JSON.stringify(data));
+
+      const response = await fetch('http://localhost:3000/api/tasks/create', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Converte a resposta para JSON
+      const responseData = await response.json();
+      const medicoID = (data.medico);
 
 
-    // Armazene os dados do paciente no localStorage
-    sessionStorage.setItem('pacienteData', JSON.stringify(data));
+      // Agora você pode acessar o PacientId
+      setPacientIdForm(responseData.IdPaciente)
+      
+      sessionStorage.setItem('MedicoName', JSON.stringify(medicoID));
+      sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
+      sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
+      sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
 
-    const response = await fetch('http://localhost:3000/api/tasks/create', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+      // Redirecione para a página do tutor
+      router.push(`/register/sample`);
 
-    const jsonResponse = await response.json();
-    const medicoid = data.medico
-
-
-    sessionStorage.setItem('IdPaciente', JSON.stringify(jsonResponse));
-    sessionStorage.setItem('MedicoId', JSON.stringify(medicoid));
-
-    // Redirecione para a página do tutor
-    router.push('/register/sample');
-
-
-
+    }
 
     toast({
       title: "You submitted the following values:",
@@ -263,12 +269,9 @@ export function AccountForm() {
   }
 
 
-
   const [disabledfield, setdisabled] = React.useState(true)
 
 
-  const [nameTutorfind, setNameTutorfind] = React.useState("")
-  const [nameMedicofind, setNameMedicofind] = React.useState("")
 
 
   const handleValueChange = (value: string) => {
@@ -297,6 +300,8 @@ export function AccountForm() {
 
 
   }
+
+  let [condition, setCondition] = useState(false);
 
 
 
@@ -344,7 +349,9 @@ export function AccountForm() {
                         setracaForm("");
                         setTutorIDForm("");
                         setMedicoIDForm("");
+                        setPacientIdForm(0);
                         setDataForm(undefined)
+                        setCondition(false)
 
                       }}>apagar</Button>
 
@@ -359,6 +366,7 @@ export function AccountForm() {
                         event.preventDefault();
                         event.stopPropagation();
                         setdisabled(false);
+                        setPacientIdForm(0);
                         setEspecieForm("");
                         setsexoForm("");
                         setracaForm("");
@@ -366,6 +374,7 @@ export function AccountForm() {
                         setMedicoIDForm("");
                         setDataForm(undefined);
                         field.onChange(pacienteForm);
+                        setCondition(false)
 
                       }}>Cadastrar</Button>
                     </CommandEmpty>
@@ -390,7 +399,7 @@ export function AccountForm() {
                               setracaForm(statusItem.racaValue);
 
                               setTutorIDForm(statusItem.tutorId);
-                              setMedicoIDForm("invalido");
+                              setMedicoIDForm("");
 
 
                               Dataformat(statusItem.dataNascimento)
@@ -399,7 +408,10 @@ export function AccountForm() {
 
                               console.log(statusItem.dataNascimento);
 
+                              setPacientIdForm(statusItem.PacientId)
+
                               setdisabled(true);
+                              setCondition(true)
 
                             }}
                           >
@@ -544,6 +556,7 @@ export function AccountForm() {
                       Formfather={null}
                       onStatusChange={(status) => {
                         field.onChange(status ? status.value : '');
+                        setNameTutorfind(status?.label);
                       }}
                       disabledfield={disabledfield}
                     />
@@ -578,17 +591,20 @@ export function AccountForm() {
                     <ComboBoxResponsive
                       statuses={null}
                       texArea="medico"
-                      IDFather={MedicoIDForm}
+                      IDFather={null}
                       Formfather={null}
                       onStatusChange={(status) => {
                         field.onChange(status ? status.value : '');
+                        setMedicoIDForm(status?.value)
+                        setNameMedicofind(status?.label)
                       }}
-                      disabledfield={disabledfield}
+                      disabledfield={false}
                     />
                     <FormDescription>
                       Procure o nome do Medico
                     </FormDescription>
-                    <FormMessage />
+                    {isVisible ? (<FormMessage>Seu texto aqui</FormMessage>) : (<FormMessage  />)}
+                    
                   </div>
                   <div className="mx-0">
                     <AlertDialog >
@@ -596,7 +612,7 @@ export function AccountForm() {
                         <Button variant="outline">+ cadastrar</Button>
                       </AlertDialogTrigger>
                       <MedicoForm onStatusChange={(newMedicoName) => {
-                        setNameMedicofind(newMedicoName);
+                        setNameMedicofind(newMedicoName); // Paulo muda isso pelo ID fica melhor igual o que faz com
                       }} />
                     </AlertDialog>
                   </div>
@@ -609,9 +625,31 @@ export function AccountForm() {
 
 
 
-        <Button type="submit" className="mt-4">
-          Proximo
-        </Button>
+        {condition ? (
+          <Button onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log(tutorIDForm);
+            console.log(MedicoIDForm);
+            sessionStorage.setItem('MedicoName', JSON.stringify(nameMedicofind));
+            sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
+            sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
+
+            
+            if (MedicoIDForm) {
+                router.push(`/register/sample?PacientId=${pacientIdForm}?PacienteName=${pacienteForm}`);
+            } else {
+                setIsVisible(true);
+            }
+          }}
+            className="mt-4">
+            Proximo
+          </Button>
+        ) : (
+          <Button type="submit" className="mt-4">Salvar</Button>
+        )}
+
+
       </form>
     </Form>
 

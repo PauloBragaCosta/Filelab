@@ -27,7 +27,13 @@ import {
 import { toast } from "../../../components/ui/use-toast"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/router'
+import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
+import React, { useState } from 'react';
+import html2canvas from 'html2canvas';
+import QRCode from 'qrcode'
+import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
+
 
 const amostraType = [
   {
@@ -45,32 +51,28 @@ const amostraType = [
 ] as const;
 
 
-const exame = [
-  {
-    id: "anatomia_patologica",
-    label: "Anatomia patólogica",
-  },
-  {
-    id: "citopatologia",
-    label: "Citopatologia",
-  },
-  {
-    id: "analise_liquidos",
-    label: "Análise líquidos",
-  },
-  {
-    id: "analise_hematologica",
-    label: "Análise hematológica",
-  },
-  {
-    id: "analise_bioquimica",
-    label: "Análise bioquimica",
-  },
-  {
-    id: "documents",
-    label: "Documents",
-  },
-] as const
+// const exam= [
+//   {
+//     id: "anatomia_patologica",
+//     label: "Anatomia patólogica",
+//   },
+//   {
+//     id: "citopatologia",
+//     label: "Citopatologia",
+//   },
+//   {
+//     id: "analise_liquidos",
+//     label: "Análise líquidos",
+//   },
+//   {
+//     id: "analise_hematologica",
+//     label: "Análise hematológica",
+//   },
+//   {
+//     id: "analise_bioquimica",
+//     label: "Análise bioquimica",
+//   },
+// ] as const
 
 
 const accountFormSchema = z.object({
@@ -80,53 +82,60 @@ const accountFormSchema = z.object({
   observation: z.string({
     required_error: "Please select a observation.",
   }),
-  amostraType: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
+  amostraType: z.string({
+    required_error: "Please select a species.",
   }),
-  amostra: z.string({
+  storageQuantity: z.string({
     required_error: "Please select a species.",
   }),
   clinicalSuspicion: z.string({
     required_error: "Please select a species.",
   }),
-  exame: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
+  examType: z.string({
+    required_error: "Please select a species.",
   }),
 })
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  amostraType: [],
-  exame: [],
-  DateTimeColeta: new Date("2023-01-23"),
+export function SampleForm() {
 
-}
+  // This can come from your database or API.
+  const defaultValues: Partial<AccountFormValues> = {
+    // amostraType: [],
+    // exam: [],
+    // DateTimeColeta: new Date("2023-01-23"),
 
-export function AccountForm() {
-  const router = useRouter();
-  const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountFormSchema),
-    defaultValues,
-  })
+  }
+  const [idExame, setidExame] = React.useState<string | null>("") 
+
+
+  const [pacientId, SetPacientId] = useState("");
+  const [amostraForm, setAmostraForm] = React.useState("") // o set vai vim da IA
+  const [dataForm, setdataForm] = React.useState<Date>() // o set vai vim da IA
+
+
 
   async function onSubmit(data: AccountFormValues) {
-    event?.preventDefault();
     console.log(data);
-    
-    const IdPacientebody = sessionStorage.getItem('IdPaciente'); // '{"IdPaciente":29}'
-    const Idmedicobody = sessionStorage.getItem('MedicoId'); // '"9745e3a2-2cd5-4993-8203-c291358a06cb"'
+
+    const PacientIdNumber: string = sessionStorage.getItem('PacienteID') || '';
+
+    // Agora você pode usar PacientId
+    SetPacientId(PacientIdNumber)
+
+    setdataForm(data.DateTimeColeta)
+
+    const Idmedicobody = sessionStorage.getItem('MedicoName'); // '"9745e3a2-2cd5-4993-8203-c291358a06cb"'
 
     const body = {
       data,
-      IdPacientebody,
-      Idmedicobody
+      pacientId,
+      Idmedicobody,
     };
 
-    console.log('Corpo da solicitação:', body);
 
-    await fetch('http://localhost:3000/api/tasks/createExame', {
+    const response = await fetch('http://localhost:3000/api/tasks/createExame', {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {
@@ -134,8 +143,21 @@ export function AccountForm() {
       }
     });
 
+    // Converte a resposta para JSON
+    const responseData = await response.json();
 
-    //router.push('/dashboard');
+    console.log(responseData.idExame)
+
+
+
+    // Agora você pode acessar o PacientId
+    sessionStorage.setItem('idExame', JSON.stringify(responseData.idExame));
+
+
+    // Redirecione para a página do tutor
+
+
+    // router.push('/dashboard');
 
 
     toast({
@@ -146,208 +168,162 @@ export function AccountForm() {
         </pre>
       ),
     })
-
   }
 
+  const form = useForm<AccountFormValues>({
+    resolver: zodResolver(accountFormSchema),
+    defaultValues,
+  })
+
+
+
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+    <div>
 
-        <FormField
-          control={form.control}
-          name="amostraType"
-          render={() => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Sidebar</FormLabel>
-                <FormDescription>
-                  Select the items you want to display in the sidebar.
-                </FormDescription>
-              </div>
-              {amostraType.map((amostraType) => (
-                <FormField
-                  key={amostraType.id}
-                  control={form.control}
-                  name="amostraType"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        key={amostraType.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(amostraType.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? field.onChange([...field.value, amostraType.id])
-                                : field.onChange(
-                                  field.value?.filter(
-                                    (value) => value !== amostraType.id
-                                  )
-                                )
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {amostraType.label}
-                        </FormLabel>
-                      </FormItem>
-                    )
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="amostraType"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
+                <ComboBoxResponsive
+                  statuses={null}
+                  texArea="storage"
+                  IDFather={amostraForm}
+                  Formfather={null}
+                  onStatusChange={(status) => {
+                    field.onChange(status ? status.value : '');
                   }}
+                  disabledfield={null}
                 />
-              ))}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="amostra"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Quantidade de frascos</FormLabel>
-              <FormControl>
-                <Input placeholder="00" {...field} />
-              </FormControl>
-              <FormDescription>
-                Este é o nome do animal
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="clinicalSuspicion"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Suspeita clínica</FormLabel>
-              <FormControl>
-                <Input placeholder="  " {...field} />
-              </FormControl>
-              <FormDescription>
-
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="observation"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Observação </FormLabel>
-              <FormControl>
-                <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field} />
-              </FormControl>
-              <FormDescription>
-
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="DateTimeColeta"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Data de coleta</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Escolha uma data</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="exame"
-          render={() => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Sidebar</FormLabel>
+          <FormField
+            control={form.control}
+            name="storageQuantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Quantidade de frascos</FormLabel>
+                <FormControl>
+                  <Input placeholder="00" {...field} />
+                </FormControl>
                 <FormDescription>
-                  Select the items you want to display in the sidebar.
+                  Escreva a quantida de amostras recebidas
                 </FormDescription>
-              </div>
-              {exame.map((exame) => (
-                <FormField
-                  key={exame.id}
-                  control={form.control}
-                  name="exame"
-                  render={({ field }) => {
-                    return (
-                      <FormItem
-                        key={exame.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="clinicalSuspicion"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Suspeita clínica</FormLabel>
+                <FormControl>
+                  <Input placeholder="  " {...field} />
+                </FormControl>
+                <FormDescription>
+
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="observation"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Observação </FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field} />
+                </FormControl>
+                <FormDescription>
+
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="DateTimeColeta"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Data de coleta</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-[240px] pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
                       >
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(exame.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? field.onChange([...field.value, exame.id])
-                                : field.onChange(
-                                  field.value?.filter(
-                                    (value) => value !== exame.id
-                                  )
-                                )
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {exame.label}
-                        </FormLabel>
-                      </FormItem>
-                    )
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Escolha uma data</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+
+          <FormField
+            control={form.control}
+            name="examType"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
+                <ComboBoxResponsive
+                  statuses={null}
+                  texArea="exam"
+                  IDFather={amostraForm}
+                  Formfather={null}
+                  onStatusChange={(status) => {
+                    field.onChange(status ? status.value : '');
                   }}
+                  disabledfield={null}
                 />
-              ))}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="mt-4">
-          Salvar
-        </Button>
-      </form>
-    </Form>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <PrinterDialog/>
+        </form>
+      </Form>
+
+    </div>
 
   )
 }

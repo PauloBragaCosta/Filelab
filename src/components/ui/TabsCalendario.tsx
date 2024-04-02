@@ -37,11 +37,6 @@ import { cn } from "@/lib/utils"
 import { Badge } from "./badge"
 import { ptBR } from "date-fns/locale"
 
-export type Status = {
-    value: string
-    label: string
-}
-
 
 export function TabsCalendario({
     IDFather,

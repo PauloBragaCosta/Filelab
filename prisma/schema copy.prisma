@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//npx prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Paciente {
+  PacientId       Int      @id @default(autoincrement())
+  nomeCompleto    String
+  especieValue    String?
+  sexoValue       String?
+  dataNascimento  DateTime
+  racaValue       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tutorId         String?
+  ExameDoPaciente OriginExam[]
+  Tutor           Tutor?   @relation(fields: [tutorId], references: [idTutor])
+  Raca            Raca?    @relation(fields: [racaValue], references: [value])
+  Sexo            Sexo?    @relation(fields: [sexoValue], references: [value])
+  Especie         Especie? @relation(fields: [especieValue], references: [value])
+}
+
+model Especie {
+  value         String     @id @default(uuid())
+  label         String?
+  PacientesSexo Paciente[]
+}
+
+model Sexo {
+  value         String     @id @default(uuid())
+  label         String?
+  PacientesSexo Paciente[]
+}
+
+model Raca {
+  value         String     @id @default(uuid())
+  label         String?
+  PacientesRaca Paciente[]
+}
+
+model Tutor {
+  idTutor                  String     @id @default(uuid())
+  nameTutor                String // Nome completo
+  telephoneTutor           String // Telefone
+  emailTutor               String // Email
+  communicationEmailsTutor Boolean // Comunicação por email
+  marketingEmailsTutor     Boolean // E-mails de marketing
+  socialWhatsappTutor      Boolean // Comunicação por Whatsapp
+  PacientesTutor           Paciente[]
+}
+
+model Medico {
+  idMedico                  String  @id @default(uuid())
+  nameMedico                String // Nome completo do médico
+  telephoneMedico           String // Telefone do médico, incluindo o DDD
+  emailMedico               String // Email do médico
+  crmv                      String // Número do CRMV do médico
+  comunicacaoEmailsMedico   Boolean // Indica se o usuário deseja receber e-mails sobre o diagnóstico do pet
+  marketingEmailsMedico     Boolean // Indica se o usuário deseja receber e-mails sobre novos produtos, recursos e muito mais
+  comunicacaoWhatsappMedico Boolean // Indica se o usuário deseja receber notificações por Whatsapp sobre o diagnóstico do pet
+  examedoMedico             Exame[]
+}
+
+
+

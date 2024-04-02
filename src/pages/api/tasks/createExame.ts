@@ -2,26 +2,25 @@ import { prisma } from "../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  let { data, IdPacientebody, Idmedicobody } = req.body;
+  let { data, pacientId, Idmedicobody } = req.body;
 
-  let { amostra, amostraType, clinicalSuspicion, observation, DateTimeColeta, exameTipo } = data
+  let { amostraType, storageQuantity, clinicalSuspicion, observation, DateTimeColeta, examType } = data
 
-  let {IdPaciente} = JSON.parse(IdPacientebody);
-  let medico = JSON.parse(Idmedicobody);
-
-
-  await prisma.exame.create({
+  const exameCriado = await prisma.originExam.create({
     data: {
-      amostra,
-      amostraType,
-      clinicalSuspicion,
-      observation,
-      DateTimeColeta,
-      exameTipo,
-      IdPaciente: IdPaciente,
-      medicoId: medico,
+      storageValue: amostraType,
+      storageQuantity: storageQuantity,
+      clinicalSuspicion: clinicalSuspicion,
+      observation:observation,
+      DateTimeColeta: DateTimeColeta,
+      exameTipo: examType,
+      IdPaciente: pacientId,
+      medicoId: Idmedicobody,
     }
+
+
+    
   });
 
-  return res.status(201).json({});
+  return res.status(201).json({ idExame: exameCriado.idExame });
 }
