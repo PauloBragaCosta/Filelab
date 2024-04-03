@@ -6,6 +6,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
   let { amostraType, storageQuantity, clinicalSuspicion, observation, DateTimeColeta, examType } = data
 
+
+
+  pacientId = Number(pacientId);
+
+  
+
+
   const exameCriado = await prisma.originExam.create({
     data: {
       storageValue: amostraType,

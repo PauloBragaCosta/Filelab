@@ -35,20 +35,20 @@ import QRCode from 'qrcode'
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 
 
-const amostraType = [
-  {
-    id: "tubo",
-    label: "Tubo",
-  },
-  {
-    id: "Pote",
-    label: "pote",
-  },
-  {
-    id: "outros",
-    label: "Outros",
-  },
-] as const;
+// const amostraType = [
+//   {
+//     id: "tubo",
+//     label: "Tubo",
+//   },
+//   {
+//     id: "Pote",
+//     label: "pote",
+//   },
+//   {
+//     id: "outros",
+//     label: "Outros",
+//   },
+// ] as const;
 
 
 // const exam= [
@@ -98,7 +98,20 @@ const accountFormSchema = z.object({
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
+
+
+
 export function SampleForm() {
+
+
+  function removerAspas(valor: string | null) {
+    if (valor !== null) {
+      return valor.replace(/^"(.*)"$/, '$1');
+    } else {
+      return null;
+    }
+  }
+
 
   // This can come from your database or API.
   const defaultValues: Partial<AccountFormValues> = {
@@ -107,26 +120,27 @@ export function SampleForm() {
     // DateTimeColeta: new Date("2023-01-23"),
 
   }
-  const [idExame, setidExame] = React.useState<string | null>("") 
+  const [idExame, setidExame] = React.useState<string | null>("")
 
 
-  const [pacientId, SetPacientId] = useState("");
+  var PacienteName = removerAspas(sessionStorage.getItem("PacienteName") || '');
+  
+  var tutorNamfont = removerAspas(sessionStorage.getItem("TutoreName") || '');
+
+
+
+  const pacientId = (sessionStorage.getItem('PacienteID'));
+
   const [amostraForm, setAmostraForm] = React.useState("") // o set vai vim da IA
   const [dataForm, setdataForm] = React.useState<Date>() // o set vai vim da IA
 
 
 
   async function onSubmit(data: AccountFormValues) {
-    console.log(data);
-
-    const PacientIdNumber: string = sessionStorage.getItem('PacienteID') || '';
-
-    // Agora você pode usar PacientId
-    SetPacientId(PacientIdNumber)
-
     setdataForm(data.DateTimeColeta)
 
-    const Idmedicobody = sessionStorage.getItem('MedicoName'); // '"9745e3a2-2cd5-4993-8203-c291358a06cb"'
+    const Idmedicobody = removerAspas(sessionStorage.getItem("MedicoName"));
+
 
     const body = {
       data,
@@ -146,15 +160,8 @@ export function SampleForm() {
     // Converte a resposta para JSON
     const responseData = await response.json();
 
-    console.log(responseData.idExame)
+    setidExame(responseData)
 
-
-
-    // Agora você pode acessar o PacientId
-    sessionStorage.setItem('idExame', JSON.stringify(responseData.idExame));
-
-
-    // Redirecione para a página do tutor
 
 
     // router.push('/dashboard');
@@ -179,10 +186,7 @@ export function SampleForm() {
 
 
   return (
-    <div>
-
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="amostraType"
@@ -211,7 +215,7 @@ export function SampleForm() {
               <FormItem>
                 <FormLabel>Quantidade de frascos</FormLabel>
                 <FormControl>
-                  <Input placeholder="00" {...field} />
+                  <Input placeholder="00" {...field || ''} />
                 </FormControl>
                 <FormDescription>
                   Escreva a quantida de amostras recebidas
@@ -228,7 +232,7 @@ export function SampleForm() {
               <FormItem>
                 <FormLabel>Suspeita clínica</FormLabel>
                 <FormControl>
-                  <Input placeholder="  " {...field} />
+                  <Input placeholder="  " {...field || ''} />
                 </FormControl>
                 <FormDescription>
 
@@ -245,7 +249,7 @@ export function SampleForm() {
               <FormItem>
                 <FormLabel>Observação </FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field} />
+                  <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field || ''} />
                 </FormControl>
                 <FormDescription>
 
@@ -318,12 +322,10 @@ export function SampleForm() {
               </FormItem>
             )}
           />
+          <Button type="submit" >salvar</Button>
 
-          <PrinterDialog/>
-        </form>
+          <PrinterDialog PacienteName={PacienteName} tutorNamfont={tutorNamfont} idExame={idExame} form={form} onSubmit={onSubmit}/>
       </Form>
-
-    </div>
 
   )
 }

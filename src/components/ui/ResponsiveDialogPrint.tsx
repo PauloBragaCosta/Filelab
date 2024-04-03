@@ -24,23 +24,20 @@ import html2canvas from "html2canvas"
 import QRCode from 'qrcode'
 import router from "next/router"
 
-function removerAspas(valor: string | null) {
-  if (valor !== null) {
-    return valor.replace(/^"(.*)"$/, '$1');
-  } else {
-    console.log("O valor é nulo.");
-    return null;
-  }
-}
 
-export function PrinterDialog() {
-
-  // Exemplo de uso:
-  var PacienteName = removerAspas(sessionStorage.getItem("PacienteName"));
-  const tutorNamfont = removerAspas(sessionStorage.getItem("TutoreName"));
-  const idExame = removerAspas(sessionStorage.getItem("idExame"));
-
-  
+export function PrinterDialog({
+  PacienteName,
+  tutorNamfont,
+  idExame,
+  form,
+  onSubmit,
+}: {
+  PacienteName: string|null
+  tutorNamfont: string|null
+  idExame: string|null
+  form: any
+  onSubmit: any
+} ) {
 
 
   const [open, setOpen] = React.useState(false)
@@ -188,7 +185,7 @@ export function PrinterDialog() {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button onClick={CreateImageWithText} variant="outline" type="submit">Imprimir</Button>
+          <Button onClick={() => {form.handleSubmit(onSubmit); CreateImageWithText}} variant="outline" type="submit" >Imprimir</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -203,7 +200,7 @@ export function PrinterDialog() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button onClick={CreateImageWithText} variant="outline" type="submit">Imprimir</Button>
+        <Button onClick={() => {form.handleSubmit(onSubmit); CreateImageWithText}} variant="outline" type="submit">Imprimir</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">

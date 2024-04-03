@@ -246,11 +246,13 @@ export function AccountForm() {
 
       // Agora você pode acessar o PacientId
       setPacientIdForm(responseData.IdPaciente)
+    
       
       sessionStorage.setItem('MedicoName', JSON.stringify(medicoID));
       sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
-      sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
+      sessionStorage.setItem('PacienteID', JSON.stringify(responseData.IdPaciente));
       sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
+
 
       // Redirecione para a página do tutor
       router.push(`/register/sample`);
@@ -280,7 +282,6 @@ export function AccountForm() {
 
 
   async function Dataformat(event: Date) {
-    console.log(event);
 
     var { zonedTimeToUtc, format } = require('date-fns-tz'); // requer a biblioteca date-fns-tz.js
 
@@ -294,8 +295,7 @@ export function AccountForm() {
       return formattedDate.replace(/GMT\+(\d{2})(\d{2})/, 'GMT-$1$2');
     }
 
-    console.log(convertIsoToReadable(event));
-    // setDataForm(convertIsoToReadable(event));
+   
 
 
 
@@ -319,9 +319,6 @@ export function AccountForm() {
         </div>
       } */}
 
-
-
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
 
 
@@ -406,7 +403,6 @@ export function AccountForm() {
                               setDataForm(statusItem.dataNascimento)
 
 
-                              console.log(statusItem.dataNascimento);
 
                               setPacientIdForm(statusItem.PacientId)
 
@@ -629,13 +625,11 @@ export function AccountForm() {
           <Button onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            console.log(tutorIDForm);
-            console.log(MedicoIDForm);
             sessionStorage.setItem('MedicoName', JSON.stringify(nameMedicofind));
             sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
             sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
-
-            
+            sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
+            sessionStorage.setItem('MedicoName', JSON.stringify(MedicoIDForm));            
             if (MedicoIDForm) {
                 router.push(`/register/sample?PacientId=${pacientIdForm}?PacienteName=${pacienteForm}`);
             } else {
@@ -646,11 +640,11 @@ export function AccountForm() {
             Proximo
           </Button>
         ) : (
-          <Button type="submit" className="mt-4">Salvar</Button>
+          <Button type="submit" onClick={form.handleSubmit(onSubmit)} className="mt-4">Salvar</Button>
         )}
 
 
-      </form>
+    
     </Form>
 
   )

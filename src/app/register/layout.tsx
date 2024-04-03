@@ -3,7 +3,7 @@
 import { useMediaQuery } from "@react-hook/media-query"
 import { Separator } from "../../components/ui/separator"
 import { SidebarNav } from "./components/sidebar-nav"
-import Header from "@/components/Pages/menus/header"
+import Header from "@/components/ui/dashboard/Header"
 
 
 // https://youtu.be/6JnkwfrAI-U?si=ANF8bv0Dgaq_wOti Veja esse vide de novo paulo para corrigir os problemas 
