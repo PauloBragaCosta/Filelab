@@ -3,7 +3,7 @@ import { prisma } from "../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-    let { nomeCompleto, especie, sexo, dataNascimento, raca, tutorId} = req.body;
+    let { nomeCompleto, especieValue, sexo, dataNascimento, raca, tutorId} = req.body;
 
     // Convertendo a string 'dataNascimento' em um objeto Date
     // dataNascimento = new Date(dataNascimento);
@@ -11,7 +11,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const pacienteCriado = await prisma.paciente.create({
         data: {
             nomeCompleto: nomeCompleto,
-            especieValue: especie,
+            especieValue: especieValue,
             sexoValue: sexo,
             dataNascimento,
             racaValue: raca,

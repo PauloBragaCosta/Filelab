@@ -1,14 +1,11 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format, set } from "date-fns"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useRouter } from 'next/navigation';
 
-import { cn } from "@/lib/utils"
 import { Button } from "../../../components/ui/button"
-import { Calendar } from "../../../components/ui/calendar"
 import {
   Form,
   FormControl,
@@ -20,11 +17,6 @@ import {
 } from "../../../components/ui/form"
 
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../components/ui/popover"
-import {
   Card,
   CardContent,
   CardHeader,
@@ -32,7 +24,6 @@ import {
 } from "../../../components/ui/card"
 
 import {
-  CalendarIcon,
   PersonIcon,
 } from "@radix-ui/react-icons"
 
@@ -52,14 +43,8 @@ import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import React, { useEffect, useState } from 'react';
 import { MedicoForm } from "../doctor/doctor-form copy"
 import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
-import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TabsCalendario } from "@/components/ui/TabsCalendario"
-import * as Accordion from '@radix-ui/react-accordion';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectValue } from "@/components/ui/select"
-import { SelectTrigger } from "@radix-ui/react-select"
-import { Input } from "@/components/ui/input"
-import { PrismaClient } from '@prisma/client'
 
 
 
@@ -82,7 +67,7 @@ const accountFormSchema = z.object({
   raca: z.string({
     required_error: "Please select a breed.",
   }),
-  especie: z.string({
+  especieValue: z.string({
     required_error: "Please select a species.",
   }),
   sexo: z.string({
@@ -145,7 +130,7 @@ export function AccountForm() {
     //nomeCompleto: "pacientes",
     // dataNascimento: new Date("2023-01-23"),
     // raca: "yorkshire",
-    //especie: "canino",
+    //especieValue: "canino",
     //sexo: sexoForm,
   }
 
@@ -431,7 +416,7 @@ export function AccountForm() {
 
         <FormField
           control={form.control}
-          name="especie"
+          name="especieValue"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Selecione a especie do animal</FormLabel>

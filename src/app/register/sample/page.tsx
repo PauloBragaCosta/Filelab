@@ -1,7 +1,21 @@
+"use client"
+
+import { useEffect, useState } from "react";
 import { Separator } from "../../../components/ui/separator"
 import { SampleForm } from "./sample-form"
 
 export default function SettingsAccountPage() {
+
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Agora é seguro usar sessionStorage
+      setData(sessionStorage.getItem('key'));
+    }
+  }, []);
+
+  
   return (
     <div className="space-y-6">
       <div>
