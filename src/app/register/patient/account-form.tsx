@@ -143,14 +143,16 @@ export function AccountForm() {
 
   const [iAForm, setIAForm] = useState(false);
 
-  useEffect(() => {
-    const pacienteSON = sessionStorage.getItem('PacienteSON');
-    if (pacienteSON) {
-      setIAForm(true);
-    }
+  // useEffect(() => {
+  //   //const pacienteSON = sessionStorage.getItem('PacienteSON');
 
-    findPaciente();
-  }, [])
+
+  //   if (pacienteSON) {
+  //     setIAForm(true);
+  //   }
+
+  //   findPaciente();
+  // }, [])
 
 
 
@@ -214,7 +216,7 @@ export function AccountForm() {
   async function onSubmit(data: AccountFormValues) {
     if (pacientIdForm === 0) {
       // Armazene os dados do paciente no localStorage
-      sessionStorage.setItem('pacienteData', JSON.stringify(data));
+      //sessionStorage.setItem('pacienteData', JSON.stringify(data));
 
       const response = await fetch('http://localhost:3000/api/tasks/create', {
         method: 'POST',
@@ -233,14 +235,14 @@ export function AccountForm() {
       setPacientIdForm(responseData.IdPaciente)
     
       
-      sessionStorage.setItem('MedicoName', JSON.stringify(medicoID));
-      sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
-      sessionStorage.setItem('PacienteID', JSON.stringify(responseData.IdPaciente));
-      sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
+      // sessionStorage.setItem('MedicoName', JSON.stringify(medicoID));
+      // sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
+      // sessionStorage.setItem('PacienteID', JSON.stringify(responseData.IdPaciente));
+      // sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
 
 
       // Redirecione para a página do tutor
-      router.push(`/register/sample`);
+      router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${responseData.IdPaciente}?MedicoNameID=${medicoID}?TutoreName=${nameTutorfind}`);
 
     }
 
@@ -610,11 +612,11 @@ export function AccountForm() {
           <Button onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            sessionStorage.setItem('MedicoName', JSON.stringify(nameMedicofind));
-            sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
-            sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
-            sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
-            sessionStorage.setItem('MedicoName', JSON.stringify(MedicoIDForm));            
+            // sessionStorage.setItem('MedicoName', JSON.stringify(nameMedicofind));
+            // sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
+            // sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
+            // sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
+            // sessionStorage.setItem('MedicoName', JSON.stringify(MedicoIDForm));            
             if (MedicoIDForm) {
                 router.push(`/register/sample?PacientId=${pacientIdForm}?PacienteName=${pacienteForm}`);
             } else {

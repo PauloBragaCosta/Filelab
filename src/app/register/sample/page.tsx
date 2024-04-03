@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Separator } from "../../../components/ui/separator"
 import { SampleForm } from "./sample-form"
+import { Suspense } from 'react'
 
 export default function SettingsAccountPage() {
 
@@ -15,7 +16,10 @@ export default function SettingsAccountPage() {
     }
   }, []);
 
-  
+  function SearchBarFallback() {
+    return <>placeholder</>
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -25,7 +29,10 @@ export default function SettingsAccountPage() {
         </p>
       </div>
       <Separator />
-      <SampleForm />
+
+      <Suspense fallback={<SearchBarFallback />}>
+        <SampleForm />
+      </Suspense>
     </div>
   )
 }

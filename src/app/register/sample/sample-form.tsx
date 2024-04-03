@@ -27,12 +27,12 @@ import {
 import { toast } from "../../../components/ui/use-toast"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useRouter } from 'next/router'
 import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
 import React, { useState } from 'react';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode'
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
+import { useSearchParams } from 'next/navigation'
 
 
 // const amostraType = [
@@ -120,16 +120,24 @@ export function SampleForm() {
     // DateTimeColeta: new Date("2023-01-23"),
 
   }
+
+
+  const searchParams = useSearchParams()
+  const pacienteForm = (searchParams?.get('pacienteForm'))
+  const PacienteID = searchParams?.get('PacienteID')
+
+  const MedicoNameID = searchParams?.get('MedicoNameID')
+
+  const TutoreName = searchParams?.get('TutoreName')
+
+
+
   const [idExame, setidExame] = React.useState<string | null>("")
 
 
-  var PacienteName = removerAspas(sessionStorage.getItem("PacienteName") || '');
-  
-  var tutorNamfont = removerAspas(sessionStorage.getItem("TutoreName") || '');
 
 
 
-  const pacientId = (sessionStorage.getItem('PacienteID'));
 
   const [amostraForm, setAmostraForm] = React.useState("") // o set vai vim da IA
   const [dataForm, setdataForm] = React.useState<Date>() // o set vai vim da IA
@@ -139,13 +147,12 @@ export function SampleForm() {
   async function onSubmit(data: AccountFormValues) {
     setdataForm(data.DateTimeColeta)
 
-    const Idmedicobody = removerAspas(sessionStorage.getItem("MedicoName"));
 
 
     const body = {
       data,
-      pacientId,
-      Idmedicobody,
+      PacienteID,
+      MedicoNameID,
     };
 
 
@@ -324,7 +331,7 @@ export function SampleForm() {
           />
           <Button type="submit" >salvar</Button>
 
-          <PrinterDialog PacienteName={PacienteName} tutorNamfont={tutorNamfont} idExame={idExame} form={form} onSubmit={onSubmit}/>
+          <PrinterDialog PacienteName={pacienteForm} tutorNamfont={TutoreName} idExame={idExame} form={form} onSubmit={onSubmit}/>
       </Form>
 
   )

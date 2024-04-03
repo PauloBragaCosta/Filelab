@@ -32,8 +32,8 @@ export function PrinterDialog({
   form,
   onSubmit,
 }: {
-  PacienteName: string|null
-  tutorNamfont: string|null
+  PacienteName: string | null | undefined
+  tutorNamfont: string | null | undefined
   idExame: string|null
   form: any
   onSubmit: any
