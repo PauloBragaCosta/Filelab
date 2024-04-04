@@ -34,7 +34,7 @@ export function PrinterDialog({
 }: {
   image: string
   base64Image: string
-  idExame: string|null
+  idExame: string
   form: any
   onSubmit: any
 } ) {

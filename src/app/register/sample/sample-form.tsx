@@ -137,6 +137,8 @@ export function SampleForm() {
 
   const [image, setImage] = React.useState("");
   const [base64Image, setbase64Image] = React.useState("");
+  const [id, setId] = React.useState("");
+
 
   async function CreateImageWithText(id: any) {
     // Crie um elemento div
@@ -272,6 +274,7 @@ export function SampleForm() {
     const responseData = await response.json();
 
     CreateImageWithText(responseData)
+    setId(responseData)
 
 
 
@@ -441,7 +444,7 @@ export function SampleForm() {
           />
           <Button type="submit" >salvar</Button>
 
-          <PrinterDialog image={image} base64Image={base64Image} form={form} onSubmit={onSubmit}/>
+          <PrinterDialog image={image} base64Image={base64Image} idExame={id} form={form} onSubmit={onSubmit}/>
       </Form>
 
   )
