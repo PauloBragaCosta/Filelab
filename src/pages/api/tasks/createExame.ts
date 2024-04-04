@@ -8,7 +8,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
 
 
-  pacientId = Number(pacientId);
+  const pacientIdNumber = Number(pacientId);
+  const medicoIdNumber = String(Idmedicobody);
+
 
   
 
@@ -21,8 +23,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       observation:observation,
       DateTimeColeta: DateTimeColeta,
       exameTipo: examType,
-      IdPaciente: pacientId,
-      medicoId: Idmedicobody,
+      IdPaciente: pacientIdNumber,
+      medicoId: medicoIdNumber,
     }
 
 

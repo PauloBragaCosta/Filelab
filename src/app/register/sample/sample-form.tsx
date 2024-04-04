@@ -269,6 +269,8 @@ export function SampleForm() {
     const responseData = await response.json();
 
     console.log(responseData)
+    console.log(data.DateTimeColeta)
+
 
     CreateImageWithText(responseData)
     setId(responseData)
