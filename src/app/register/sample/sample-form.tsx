@@ -99,12 +99,24 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 
+const searchParams = useSearchParams()
+const pacienteForm = (searchParams?.get('pacienteForm'))
+console.log(pacienteForm)
+const PacienteID = searchParams?.get('PacienteID')
+console.log(PacienteID)
+
+
+const MedicoNameID = searchParams?.get('MedicoNameID')
+console.log(MedicoNameID)
+
+const TutoreName = searchParams?.get('TutoreName')
+console.log(TutoreName)
 
 
 export function SampleForm() {
 
 
- 
+
   // This can come from your database or API.
   const defaultValues: Partial<AccountFormValues> = {
     // amostraType: [],
@@ -114,18 +126,7 @@ export function SampleForm() {
   }
 
 
-  const searchParams = useSearchParams()
-  const pacienteForm = (searchParams?.get('pacienteForm'))
-  console.log(pacienteForm)
-  const PacienteID = searchParams?.get('PacienteID')
-  console.log(PacienteID)
 
-
-  const MedicoNameID = searchParams?.get('MedicoNameID')
-  console.log(MedicoNameID)
-
-  const TutoreName = searchParams?.get('TutoreName')
-  console.log(TutoreName)
 
 
 
@@ -273,6 +274,8 @@ export function SampleForm() {
     // Converte a resposta para JSON
     const responseData = await response.json();
 
+    console.log(responseData)
+
     CreateImageWithText(responseData)
     setId(responseData)
 
@@ -297,7 +300,7 @@ export function SampleForm() {
   })
 
 
-  
+
 
 
 
@@ -306,146 +309,146 @@ export function SampleForm() {
 
 
   return (
-      <Form {...form}>
-          <FormField
-            control={form.control}
-            name="amostraType"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
-                <ComboBoxResponsive
-                  statuses={null}
-                  texArea="storage"
-                  IDFather={amostraForm}
-                  Formfather={null}
-                  onStatusChange={(status) => {
-                    field.onChange(status ? status.value : '');
-                  }}
-                  disabledfield={null}
+    <Form {...form}>
+      <FormField
+        control={form.control}
+        name="amostraType"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
+            <ComboBoxResponsive
+              statuses={null}
+              texArea="storage"
+              IDFather={amostraForm}
+              Formfather={null}
+              onStatusChange={(status) => {
+                field.onChange(status ? status.value : '');
+              }}
+              disabledfield={null}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="storageQuantity"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Quantidade de frascos</FormLabel>
+            <FormControl>
+              <Input placeholder="00" {...field || ''} />
+            </FormControl>
+            <FormDescription>
+              Escreva a quantida de amostras recebidas
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="clinicalSuspicion"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Suspeita clínica</FormLabel>
+            <FormControl>
+              <Input placeholder="  " {...field || ''} />
+            </FormControl>
+            <FormDescription>
+
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="observation"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Observação </FormLabel>
+            <FormControl>
+              <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field || ''} />
+            </FormControl>
+            <FormDescription>
+
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="DateTimeColeta"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Data de coleta</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP")
+                    ) : (
+                      <span>Escolha uma data</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={field.onChange}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("1900-01-01")
+                  }
+                  initialFocus
                 />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="storageQuantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantidade de frascos</FormLabel>
-                <FormControl>
-                  <Input placeholder="00" {...field || ''} />
-                </FormControl>
-                <FormDescription>
-                  Escreva a quantida de amostras recebidas
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="clinicalSuspicion"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Suspeita clínica</FormLabel>
-                <FormControl>
-                  <Input placeholder="  " {...field || ''} />
-                </FormControl>
-                <FormDescription>
-
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="observation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Observação </FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field || ''} />
-                </FormControl>
-                <FormDescription>
-
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="DateTimeColeta"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Data de coleta</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Escolha uma data</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
 
-          <FormField
-            control={form.control}
-            name="examType"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
-                <ComboBoxResponsive
-                  statuses={null}
-                  texArea="exam"
-                  IDFather={amostraForm}
-                  Formfather={null}
-                  onStatusChange={(status) => {
-                    field.onChange(status ? status.value : '');
-                  }}
-                  disabledfield={null}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" >salvar</Button>
+      <FormField
+        control={form.control}
+        name="examType"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
+            <ComboBoxResponsive
+              statuses={null}
+              texArea="exam"
+              IDFather={amostraForm}
+              Formfather={null}
+              onStatusChange={(status) => {
+                field.onChange(status ? status.value : '');
+              }}
+              disabledfield={null}
+            />
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <Button type="submit" >salvar</Button>
 
-          <PrinterDialog image={image} base64Image={base64Image} idExame={id} form={form} onSubmit={onSubmit}/>
-      </Form>
+      <PrinterDialog image={image} base64Image={base64Image} idExame={id} form={form} onSubmit={onSubmit} />
+    </Form>
 
   )
 }
