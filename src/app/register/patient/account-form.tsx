@@ -154,11 +154,16 @@ export function AccountForm() {
   //   findPaciente();
   // }, [])
 
+   useEffect(() => {
+    findPaciente();
+  }, [])
+
+
 
 
   async function findPaciente() {
 
-    const response = await fetch('http://localhost:3000/api/tasks/findPaciente', {
+    const response = await fetch('/api/tasks/findPaciente', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -534,7 +539,7 @@ export function AccountForm() {
                   <div className="flex flex-col">
                     <ComboBoxResponsive
                       statuses={null}
-                      texArea="tutor"
+                      texArea="Tutor"
                       IDFather={tutorIDForm} // esse e o valor do tutor mas vai ser levado para a raça tb quando fazer o banco de dados parecido com o do medico e tutor
                       Formfather={null}
                       onStatusChange={(status) => {
@@ -573,7 +578,7 @@ export function AccountForm() {
                   <div className="flex flex-col">
                     <ComboBoxResponsive
                       statuses={null}
-                      texArea="medico"
+                      texArea="Medico"
                       IDFather={null}
                       Formfather={null}
                       onStatusChange={(status) => {

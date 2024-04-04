@@ -106,7 +106,7 @@ export function ComboBoxResponsive({
                 }
             });
 
-            if (texArea === 'medico') {
+            if (texArea === 'Medico') {
                 const Medicos = await response.json();
 
                 // Transforma os dados para o formato desejado
@@ -125,7 +125,7 @@ export function ComboBoxResponsive({
             }
 
 
-            if (texArea === 'tutor') {
+            if (texArea === 'Tutor') {
                 const Tutores = await response.json();
 
                 // Transforma os dados para o formato desejado
