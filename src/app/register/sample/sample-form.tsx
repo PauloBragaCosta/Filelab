@@ -34,6 +34,7 @@ import { useSearchParams } from 'next/navigation'
 
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode'
+import { cookies } from "next/headers"
 
 
 // const amostraType = [
@@ -99,18 +100,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 
-const searchParams = useSearchParams()
-const pacienteForm = (searchParams?.get('pacienteForm'))
-console.log(pacienteForm)
-const PacienteID = searchParams?.get('PacienteID')
-console.log(PacienteID)
 
-
-const MedicoNameID = searchParams?.get('MedicoNameID')
-console.log(MedicoNameID)
-
-const TutoreName = searchParams?.get('TutoreName')
-console.log(TutoreName)
 
 
 export function SampleForm() {
@@ -125,11 +115,19 @@ export function SampleForm() {
 
   }
 
+  const cookieStore = cookies()
 
+  const PacienteName = cookieStore.get('PacienteName')
+  console.log(PacienteName)
+  
+  const PacienteID = cookieStore.get('PacienteID')
+  console.log(PacienteID)
 
+  const MedicoNameID = cookieStore.get('MedicoNameID')
+  console.log(MedicoNameID)
 
-
-
+  const TutoreName = cookieStore.get('TutoreName')
+  console.log(TutoreName)
 
 
 
@@ -191,7 +189,7 @@ export function SampleForm() {
     div.appendChild(infoDiv);
 
     const patientName = document.createElement('p');
-    patientName.textContent = `${pacienteForm}`; // Substitua pelo nome do paciente
+    patientName.textContent = `${PacienteName}`; // Substitua pelo nome do paciente
     patientName.style.fontWeight = 'bold'; // Adicione esta linha
     patientName.style.marginBottom = '0'; // Adicione esta linha
     infoDiv.appendChild(patientName);
