@@ -51,7 +51,6 @@ import QRCode from 'qrcode'
 //   },
 // ] as const;
 
-
 // const exam= [
 //   {
 //     id: "anatomia_patologica",
