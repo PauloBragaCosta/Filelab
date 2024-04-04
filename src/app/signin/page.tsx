@@ -42,8 +42,8 @@ const LoginPage = () => {
         <Link
           href="/examples/authentication"
           className=
-            "absolute right-4 top-4 md:right-8 md:top-8"
-          
+          "absolute right-4 top-4 md:right-8 md:top-8"
+
         >
           Cadastrar
         </Link>
@@ -86,38 +86,38 @@ const LoginPage = () => {
               </p>
             </div>
 
-                <div className="grid gap-6">
-                  <div className="grid gap-2">
-                    <div className="grid gap-1">
-                    <TextBox
-                    
-                      labelText="Usuário"
-                      onChange={(e) => (userName.current = e.target.value)}
-                    />
-                    <TextBox
-                      labelText="Senha"
-                      type={"password"}
-                      onChange={(e) => (pass.current = e.target.value)}
-                    />
-                    </div>
-                    <Button onClick={onSubmit}>Login</Button>
-                  </div>
+            <div className="grid gap-6">
+              <div className="grid gap-2">
+                <div className="grid gap-1">
+                  <TextBox
+
+                    labelText="Usuário"
+                    onChange={(e) => (userName.current = e.target.value)}
+                  />
+                  <TextBox
+                    labelText="Senha"
+                    type={"password"}
+                    onChange={(e) => (pass.current = e.target.value)}
+                  />
                 </div>
-                
-                      <p className="px-8 text-center text-sm text-muted-foreground">
-                        Ao clicar em continuar, você concorda com o nosso{" "}
+                <Button onClick={onSubmit}>Login</Button>
+              </div>
+            </div>
+
+            <p className="px-8 text-center text-sm text-muted-foreground">
+              Ao clicar em continuar, você concorda com o nosso{" "}
               <Link
-                          href="/terms"
-                          className="underline underline-offset-4 hover:text-primary"
-                        >
-                          termo de serviços
-                        </Link>{" "}
-                        
-                        .
-                      </p>
-                    </div>
-                  </div>
-                  </div>
+                href="/terms"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                termo de serviços
+              </Link>{" "}
+
+              .
+            </p>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
