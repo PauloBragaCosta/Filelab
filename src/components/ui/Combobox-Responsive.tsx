@@ -96,7 +96,7 @@ export function ComboBoxResponsive({
 
     async function find() {
         try {
-            const response = await fetch(`http://localhost:3000/api/tasks/find${texArea}`, {
+            const response = await fetch(`/api/tasks/find${texArea}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
