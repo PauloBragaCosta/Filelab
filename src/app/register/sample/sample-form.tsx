@@ -1,5 +1,3 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
@@ -119,7 +117,7 @@ export function SampleForm() {
 
   const PacienteName = cookieStore.get('PacienteName')
   console.log(PacienteName)
-  
+
   const PacienteID = cookieStore.get('PacienteID')
   console.log(PacienteID)
 
