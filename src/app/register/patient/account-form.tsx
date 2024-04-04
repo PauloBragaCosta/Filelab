@@ -623,7 +623,8 @@ export function AccountForm() {
             // sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
             // sessionStorage.setItem('MedicoName', JSON.stringify(MedicoIDForm));            
             if (MedicoIDForm) {
-                router.push(`/register/sample?PacientId=${pacientIdForm}?PacienteName=${pacienteForm}`);
+                router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${pacientIdForm}?MedicoNameID=${MedicoIDForm}?TutoreName=${nameTutorfind}`);
+
             } else {
                 setIsVisible(true);
             }
