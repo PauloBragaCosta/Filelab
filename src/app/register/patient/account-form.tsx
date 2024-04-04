@@ -43,7 +43,7 @@ import { MedicoForm } from "../doctor/doctor-form copy"
 import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TabsCalendario } from "@/components/ui/TabsCalendario"
-import { cookies } from "next/headers";
+import Cookies from 'js-cookie'
 
 
 
@@ -83,7 +83,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
-  const cookieStore = cookies()
+ 
 
   const [sexoForm, setsexoForm] = useState("");
   const [pacienteForm, setPacienteForm] = useState("")
@@ -240,11 +240,11 @@ export function AccountForm() {
       setPacientIdForm(responseData.IdPaciente)
 
 
-      cookieStore.set('PacienteName', pacienteForm)
-      cookieStore.set('PacienteID', responseData.IdPaciente)
-      cookieStore.set('MedicoNameID', medicoID)
+      Cookies.set('PacienteName', pacienteForm)
+      Cookies.set('PacienteID', responseData.IdPaciente)
+      Cookies.set('MedicoNameID', medicoID)
       if (nameTutorfind !== undefined) {
-        cookieStore.set('TutoreName', nameTutorfind)
+        Cookies.set('TutoreName', nameTutorfind)
       }
 
       // Redirecione para a página do tutor
@@ -624,14 +624,14 @@ export function AccountForm() {
           // sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
           // sessionStorage.setItem('MedicoName', JSON.stringify(MedicoIDForm));
 
-          cookieStore.set('PacienteName', pacienteForm)
+          Cookies.set('PacienteName', pacienteForm)
           const pacientId = String(pacientIdForm) || "";
-          cookieStore.set('PacienteID', pacientId)
+          Cookies.set('PacienteID', pacientId)
           if (MedicoIDForm !== undefined) {
-            cookieStore.set('MedicoNameID', MedicoIDForm)
+            Cookies.set('MedicoNameID', MedicoIDForm)
           }
           if (nameTutorfind !== undefined) {
-            cookieStore.set('TutoreName', nameTutorfind)
+            Cookies.set('TutoreName', nameTutorfind)
           }
           if (MedicoIDForm) {
             router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${pacientIdForm}?MedicoNameID=${MedicoIDForm}?TutoreName=${nameTutorfind}`);

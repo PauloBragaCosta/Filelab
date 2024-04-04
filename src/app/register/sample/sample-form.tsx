@@ -31,7 +31,7 @@ import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode'
-import { cookies } from "next/headers"
+import Cookies from 'js-cookie'
 
 
 // const amostraType = [
@@ -112,18 +112,17 @@ export function SampleForm() {
 
   }
 
-  const cookieStore = cookies()
 
-  const PacienteName = cookieStore.get('PacienteName')
+  const PacienteName = Cookies.get('PacienteName')
   console.log(PacienteName)
 
-  const PacienteID = cookieStore.get('PacienteID')
+  const PacienteID = Cookies.get('PacienteID')
   console.log(PacienteID)
 
-  const MedicoNameID = cookieStore.get('MedicoNameID')
+  const MedicoNameID = Cookies.get('MedicoNameID')
   console.log(MedicoNameID)
 
-  const TutoreName = cookieStore.get('TutoreName')
+  const TutoreName = Cookies.get('TutoreName')
   console.log(TutoreName)
 
 
