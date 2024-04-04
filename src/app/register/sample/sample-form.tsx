@@ -156,7 +156,7 @@ export function SampleForm() {
     };
 
 
-    const response = await fetch('http://localhost:3000/api/tasks/createExame', {
+    const response = await fetch('/api/tasks/createExame', {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {

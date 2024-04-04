@@ -223,7 +223,7 @@ export function AccountForm() {
       // Armazene os dados do paciente no localStorage
       //sessionStorage.setItem('pacienteData', JSON.stringify(data));
 
-      const response = await fetch('http://localhost:3000/api/tasks/create', {
+      const response = await fetch('/api/tasks/create', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
