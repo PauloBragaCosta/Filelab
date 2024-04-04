@@ -11,8 +11,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   const pacientIdNumber = Number(pacientId);
   // const medicoIdNumber = String(Idmedicobody);
 
+  console.log(pacientIdNumber)
+  console.log(Idmedicobody)
 
-  
+
 
 
   const exameCriado = await prisma.originExam.create({
@@ -20,7 +22,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       storageValue: amostraType,
       storageQuantity: storageQuantity,
       clinicalSuspicion: clinicalSuspicion,
-      observation:observation,
+      observation: observation,
       DateTimeColeta: DateTimeColeta,
       exameTipo: examType,
       IdPaciente: pacientIdNumber,
@@ -28,7 +30,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
 
 
-    
+
   });
 
   return res.status(201).json({ idExame: exameCriado.idExame });
