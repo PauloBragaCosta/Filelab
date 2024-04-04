@@ -1,4 +1,4 @@
-"use client"
+
 
 import { Separator } from "../../../components/ui/separator"
 import { AccountForm } from "../../register/patient/account-form"
