@@ -16,18 +16,30 @@ export default NextAuth({
             },
             password: { label: "Password", type: "password" },
           },
-          async authorize(credentials) {
-            // This is where you need to retrieve user data 
-            // to verify with credentials
-            // Docs: https://next-auth.js.org/configuration/providers/credentials
-            const user = { id: "42", email: "Paulo", password: "12345" }
-
-            if (credentials?.username === user.email && credentials?.password === user.password) {
-                return user
-            } else {
-                return null
+          async authorize() {
+            return {
+              id: 1,
+              name: "J Smith",
+              email: "jsmith@example.com",
+              image: "https://i.pravatar.cc/150?u=jsmith@example.com",
             }
-        },
+          },
+
+
+
+
+        //   async authorize(credentials) {
+        //     // This is where you need to retrieve user data 
+        //     // to verify with credentials
+        //     // Docs: https://next-auth.js.org/configuration/providers/credentials
+        //     const user = { id: "42", email: "Paulo", password: "12345" }
+
+        //     if (credentials?.username === user.email && credentials?.password === user.password) {
+        //         return user
+        //     } else {
+        //         return null
+        //     }
+        // },
     })
       : GoogleProvider({
           clientId: process.env.GOOGLE_ID,
