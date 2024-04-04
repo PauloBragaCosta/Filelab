@@ -28,7 +28,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
 import React from 'react';
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
-import { useSearchParams } from 'next/navigation'
 
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode'
