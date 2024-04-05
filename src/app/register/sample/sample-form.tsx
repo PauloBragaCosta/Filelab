@@ -30,6 +30,7 @@ import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
 import React from 'react';
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 import Cookies from 'js-cookie'
+import { CreateImageWithText } from "./CreateImageWithText"
 
 
 // const amostraType = [
@@ -344,11 +345,11 @@ export function SampleForm() {
       <Button type="submit" >salvar</Button>
 
       <PrinterDialog image={image} base64Image={base64Image} idExame={id} form={form} onSubmit={onSubmit} />
+
+      <img src={image} alt="Image" className="aspect-ratio-16/9 rounded-md object-cover" />
     </Form>
 
   )
 }
-function CreateImageWithText(id: string, PacienteName: string | undefined, TutoreName: string | undefined) {
-  throw new Error("Function not implemented.")
-}
+
 

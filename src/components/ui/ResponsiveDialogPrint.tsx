@@ -20,8 +20,6 @@ import {
 } from "@/components/ui/drawer"
 import { Label } from "@/components/ui/label"
 import { useMediaQuery } from "@react-hook/media-query"
-import html2canvas from "html2canvas"
-import QRCode from 'qrcode'
 import router from "next/router"
 
 
@@ -43,6 +41,11 @@ export function PrinterDialog({
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
+  function setOpenandSeend() {
+    form.handleSubmit(onSubmit);
+    setOpen
+  }
+
   async function print() {
     await fetch(`http://localhost:5000/`, {
       method: 'POST',
@@ -63,9 +66,9 @@ export function PrinterDialog({
 
   if (isDesktop) {
     return (
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={setOpenandSeend}>
         <DialogTrigger asChild>
-          <Button onClick={form.handleSubmit(onSubmit)} variant="outline" type="submit" >Imprimir</Button>
+          <Button variant="outline">Imprimir</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -78,9 +81,9 @@ export function PrinterDialog({
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={open} onOpenChange={setOpenandSeend}>
       <DrawerTrigger asChild>
-        <Button onClick={form.handleSubmit(onSubmit)} variant="outline" type="submit">Imprimir</Button>
+        <Button variant="outline">Imprimir</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
