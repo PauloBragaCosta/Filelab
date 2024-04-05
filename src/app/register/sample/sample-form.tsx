@@ -1,4 +1,5 @@
 "use client"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CalendarIcon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
@@ -25,13 +26,10 @@ import {
 } from "../../../components/ui/popover"
 import { toast } from "../../../components/ui/use-toast"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
 import React from 'react';
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 import Cookies from 'js-cookie'
-import { CreateImageWithText } from "../printer/CreateImageWithText"
-import router from "next/router"
+import { useRouter } from 'next/navigation';
 
 
 // const amostraType = [
@@ -101,6 +99,7 @@ type AccountFormValues = z.infer<typeof accountFormSchema>
 
 
 export function SampleForm() {
+  const router = useRouter();
 
 
 
