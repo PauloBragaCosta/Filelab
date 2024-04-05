@@ -620,12 +620,7 @@ export function AccountForm() {
         <Button onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
-          // sessionStorage.setItem('MedicoName', JSON.stringify(nameMedicofind));
-          // sessionStorage.setItem('PacienteName', JSON.stringify(pacienteForm));
-          // sessionStorage.setItem('TutoreName', JSON.stringify(nameTutorfind));
-          // sessionStorage.setItem('PacienteID', JSON.stringify(pacientIdForm));
-          // sessionStorage.setItem('MedicoName', JSON.stringify(MedicoIDForm));
-
+      
           Cookies.set('PacienteName', pacienteForm)
           const pacientId = String(pacientIdForm) || "";
           Cookies.set('PacienteID', pacientId)
