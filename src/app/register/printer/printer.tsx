@@ -13,12 +13,17 @@ import QRCode from 'qrcode'
 
 export function PrinterForm() {
   const PacienteName = Cookies.get('PacienteName')
+  console.log(PacienteName)
+
   const TutoreName = Cookies.get('TutoreName')
+  console.log(TutoreName)
+
   const idExame = Cookies.get('idExame')
+  console.log(String(idExame))
+
 
   const [image, setImage] = React.useState("");
   const [base64Image, setBase64Image] = React.useState("");
-  console.log(idExame)
 
 
 
