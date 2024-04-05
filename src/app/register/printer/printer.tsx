@@ -18,6 +18,7 @@ export function PrinterForm() {
 
   const [image, setImage] = React.useState("");
   const [base64Image, setBase64Image] = React.useState("");
+  console.log(idExame)
 
 
 
@@ -152,11 +153,9 @@ export function PrinterForm() {
     })
   }
 
-  
+
   return (
     <div>
-      <img src={image} alt="Image" className="aspect-ratio-16/9 rounded-md object-cover" />
-
       <Tabs defaultValue="grande" className="w-[400px]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="grande">Etiqueta grande</TabsTrigger>
