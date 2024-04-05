@@ -137,7 +137,7 @@ export function SampleForm() {
     // Converte a resposta para JSON
     const responseData = await response.json();
     Cookies.set('idExame', responseData)
-    router.push('/printer');
+    router.push('/register/printer');
     toast({
       title: "You submitted the following values:",
       description: (
