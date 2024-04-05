@@ -30,7 +30,8 @@ import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
 import React from 'react';
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 import Cookies from 'js-cookie'
-import { CreateImageWithText } from "./CreateImageWithText"
+import { CreateImageWithText } from "../printer/CreateImageWithText"
+import router from "next/router"
 
 
 // const amostraType = [
@@ -111,46 +112,21 @@ export function SampleForm() {
 
   }
 
-
-  const PacienteName = Cookies.get('PacienteName')
-  console.log(PacienteName)
-
   const PacienteID = Cookies.get('PacienteID')
-  console.log(PacienteID)
-
   const MedicoNameID = Cookies.get('MedicoNameID')
-  console.log(MedicoNameID)
-
-  const TutoreName = Cookies.get('TutoreName')
-  console.log(TutoreName)
-
-
 
   const [amostraForm, setAmostraForm] = React.useState("") // o set vai vim da IA
   const [dataForm, setdataForm] = React.useState<Date>() // o set vai vim da IA
-
-  const [image, setImage] = React.useState("");
-  const [base64Image, setbase64Image] = React.useState("");
-  const [id, setId] = React.useState("");
 
 
 
   async function onSubmit(data: AccountFormValues) {
     setdataForm(data.DateTimeColeta)
-  
-
     const body = {
       data,
       PacienteID,
       MedicoNameID,
     };
-
-    console.log(body.PacienteID)
-    console.log(body.MedicoNameID)
-
-    console.log(data.DateTimeColeta)
-
-
     const response = await fetch('/api/tasks/createExame', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -161,26 +137,8 @@ export function SampleForm() {
 
     // Converte a resposta para JSON
     const responseData = await response.json();
-
-    console.log(responseData)
-
-
-
-    const result = String(CreateImageWithText(id, PacienteName, TutoreName))
-
-    setImage(result);
-   
-
-    const base64Image = result.replace(/^data:image\/\w+;base64,/, "");
-    console.log(base64Image);
-
-    setId(responseData)
-
-
-
-    // router.push('/dashboard');
-
-
+    Cookies.set('idExame', responseData)
+    router.push('/printer');
     toast({
       title: "You submitted the following values:",
       description: (
@@ -195,15 +153,6 @@ export function SampleForm() {
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   })
-
-
-
-
-
-
-
-
-
 
   return (
     <Form {...form}>
@@ -342,11 +291,9 @@ export function SampleForm() {
           </FormItem>
         )}
       />
-      <Button type="submit" >salvar</Button>
+      <Button onClick={form.handleSubmit(onSubmit)} >salvar</Button>
 
-      <PrinterDialog image={image} base64Image={base64Image} idExame={id} form={form} onSubmit={onSubmit} />
 
-      <img src={image} alt="Image" className="aspect-ratio-16/9 rounded-md object-cover" />
     </Form>
 
   )

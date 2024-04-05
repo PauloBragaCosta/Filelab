@@ -3,7 +3,7 @@
 import html2canvas from "html2canvas";
 import QRCode from 'qrcode'
 
-export async function CreateImageWithText(id: String, PacienteName: string | undefined, TutoreName: string | undefined) {
+export async function CreateImageWithText(id: string | undefined, PacienteName: string | undefined, TutoreName: string | undefined) {
     // Crie um elemento div
     const div = document.createElement('div');
     div.style.width = '384px';

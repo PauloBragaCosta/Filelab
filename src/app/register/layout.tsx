@@ -22,8 +22,8 @@ const sidebarNavItems = [
     href: "/register/sample",
   },
   {
-    title: "Pagamento",
-    href: "/register/pay",
+    title: "Impreção",
+    href: "/register/printer",
   },
 ]
 
