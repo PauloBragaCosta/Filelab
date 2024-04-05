@@ -1,40 +1,13 @@
 "use client"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon } from "@radix-ui/react-icons"
-import { format } from "date-fns"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 
-import { cn } from "@/lib/utils"
 import { Button } from "../../../components/ui/button"
-import { Calendar } from "../../../components/ui/calendar"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../../components/ui/form"
 import { Input } from "../../../components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../components/ui/popover"
-import { toast } from "../../../components/ui/use-toast"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { PrinterDialog } from "@/components/ui/ResponsiveDialogPrint"
 import React from 'react';
-import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 import Cookies from 'js-cookie'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateImageWithText } from "./CreateImageWithText"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-
 
 
 export function PrinterForm() {
