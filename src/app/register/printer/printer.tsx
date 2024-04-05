@@ -44,6 +44,9 @@ export function PrinterForm() {
   }
 
   return (
+    <div>
+    <img src={image} alt="Image" className="aspect-ratio-16/9 rounded-md object-cover" />
+
     <Tabs defaultValue="grande" className="w-[400px]">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="grande">Etiqueta grande</TabsTrigger>
@@ -87,7 +90,7 @@ export function PrinterForm() {
         </Card>
       </TabsContent>
     </Tabs>
-
+    </div>
   )
 }
 
