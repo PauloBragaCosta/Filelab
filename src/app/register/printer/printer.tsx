@@ -2,7 +2,7 @@
 
 import { Button } from "../../../components/ui/button"
 import { Input } from "../../../components/ui/input"
-import React from 'react';
+import React, { useEffect } from 'react';
 import Cookies from 'js-cookie'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateImageWithText } from "./CreateImageWithText"
@@ -16,14 +16,21 @@ export function PrinterForm() {
   const idExame = Cookies.get('idExame')
 
   const [image, setImage] = React.useState("");
+  const [base64Image, setBase64Image] = React.useState("");
 
 
-  const result = String(CreateImageWithText(idExame, PacienteName, TutoreName))
+  async function imageCreater() {
+    const result = String(CreateImageWithText(idExame, PacienteName, TutoreName))
+    const base64Image = result.replace(/^data:image\/\w+;base64,/, "");
+    setBase64Image(base64Image);
+    setImage(result);
+  }
 
-  setImage(result);
+  useEffect(() => {
+    imageCreater();
+  }, [])
 
-  const base64Image = result.replace(/^data:image\/\w+;base64,/, "");
-  console.log(base64Image);
+
 
   async function print() {
     await fetch(`http://localhost:5000/`, {
