@@ -391,6 +391,7 @@ export function AccountForm() {
                             setracaForm(statusItem.racaValue);
 
                             setTutorIDForm(statusItem.tutorId);
+                            Cookies.set('TutoreName', statusItem.tutorId)
                             setMedicoIDForm("");
 
 
@@ -626,9 +627,6 @@ export function AccountForm() {
           Cookies.set('PacienteID', pacientId)
           if (MedicoIDForm !== undefined) {
             Cookies.set('MedicoNameID', MedicoIDForm)
-          }
-          if (nameTutorfind !== undefined) {
-            Cookies.set('TutoreName', nameTutorfind)
           }
           if (MedicoIDForm) {
             router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${pacientIdForm}?MedicoNameID=${MedicoIDForm}?TutoreName=${nameTutorfind}`);

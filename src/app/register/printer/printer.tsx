@@ -13,13 +13,10 @@ import QRCode from 'qrcode'
 
 export function PrinterForm() {
   const PacienteName = Cookies.get('PacienteName')
-  console.log(PacienteName)
 
   const TutoreName = Cookies.get('TutoreName')
-  console.log(TutoreName)
 
   const idExame = Cookies.get('idExame')
-  console.log(String(idExame))
 
 
   const [image, setImage] = React.useState("");
@@ -70,6 +67,14 @@ export function PrinterForm() {
       qrDiv.appendChild(qrCode);
     });
 
+    //  const examNumber = `${idExame}`; // Substitua pelo número do exame
+    //  QRCode.toDataURL(examNumber, function (err: any, url: string) {
+    //   const qrCode = document.getElementById('qrDiv');
+    //   qrCode.innerHTML = svgString;
+    //   qrDiv.appendChild(qrDiv);
+    // });
+
+    
     // Crie uma div para as informações
     const infoDiv = document.createElement('div');
     infoDiv.style.flex = '2';
