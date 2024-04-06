@@ -18,6 +18,9 @@ export function PrinterForm() {
 
   const idExame = Cookies.get('idExame')
 
+  const DateTimeColeta = Cookies.get('DateTimeColeta')
+
+
 
   const [image, setImage] = React.useState("");
   const [base64Image, setBase64Image] = React.useState("");
@@ -105,7 +108,7 @@ export function PrinterForm() {
     infoDiv.appendChild(tutorName);
 
     const collectionDate = document.createElement('p');
-    collectionDate.textContent = 'Data da coleta: 30/03/2024'; // Substitua pela data da coleta
+    collectionDate.textContent = `Data da coleta: ${DateTimeColeta}`; // Substitua pela data da coleta
     collectionDate.style.marginBottom = '10px'; // Adicione esta linha
     infoDiv.appendChild(collectionDate);
 

@@ -120,6 +120,7 @@ export function SampleForm() {
 
 
   async function onSubmit(data: AccountFormValues) {
+    
     setdataForm(data.DateTimeColeta)
     const body = {
       data,
@@ -137,9 +138,9 @@ export function SampleForm() {
     // Converte a resposta para JSON
     const responseData = await response.json();
     Cookies.set('idExame', responseData.idExame)
-    console.log(data.DateTimeColeta.getDate)
-    Cookies.set('DateTimeColeta', String(data.DateTimeColeta))
+    Cookies.set('DateTimeColeta', `${data.DateTimeColeta.getDate()}/${data.DateTimeColeta.getMonth()}/${data.DateTimeColeta.getFullYear()}`)
     router.push('/register/printer');
+
     toast({
       title: "You submitted the following values:",
       description: (
