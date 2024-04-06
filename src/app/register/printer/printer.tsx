@@ -89,6 +89,7 @@ export function PrinterForm() {
     const patientName = document.createElement('p');
     patientName.textContent = `${PacienteName}`; // Substitua pelo nome do paciente
     patientName.style.fontWeight = 'bold'; // Adicione esta linha
+    patientName.style.fontSize = '30px'; // Adicione esta linha
     patientName.style.marginBottom = '0'; // Adicione esta linha
     infoDiv.appendChild(patientName);
 
