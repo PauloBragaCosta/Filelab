@@ -154,7 +154,7 @@ export function PrinterForm() {
 
 
   async function print() {
-    await fetch(`http://localhost:5000/`, {
+    await fetch(`http://127.0.0.1:5000`, {
       method: 'POST',
       body: JSON.stringify(base64Image),
       headers: {
