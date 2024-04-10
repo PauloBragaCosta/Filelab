@@ -1,5 +1,5 @@
 import { Separator } from "../../../components/ui/separator"
-import { ImageForm } from "./image-form"
+import { ImageForm } from "../image/image-form"
 
 export default function SettingsAccountPage() {
   return (

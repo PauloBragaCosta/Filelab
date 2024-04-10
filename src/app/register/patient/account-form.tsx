@@ -45,6 +45,7 @@ import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TabsCalendario } from "@/components/ui/TabsCalendario"
 import Cookies from 'js-cookie'
+import { AddTags } from "./addtags";
 
 
 
@@ -85,7 +86,7 @@ const accountFormSchema = z.object({
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
- 
+
 
   const [sexoForm, setsexoForm] = useState("");
   const [pacienteForm, setPacienteForm] = useState("")
@@ -431,16 +432,27 @@ export function AccountForm() {
         render={({ field }) => (
           <FormItem className="flex flex-col">
             <FormLabel>Selecione a especie do animal</FormLabel>
-            <ComboBoxResponsive
-              statuses={null}
-              texArea="especie"
-              IDFather={especieForm}
-              Formfather={null}
-              onStatusChange={(status) => {
-                field.onChange(status ? status.value : '');
-              }}
-              disabledfield={disabledfield}
-            />
+            <div className="flex">
+              <ComboBoxResponsive
+                statuses={null}
+                texArea="especie"
+                IDFather={especieForm}
+                Formfather={null}
+                onStatusChange={(status) => {
+                  field.onChange(status ? status.value : '');
+                }}
+                disabledfield={disabledfield}
+              />
+              <AddTags
+                tag="especie"
+                disabledfield={disabledfield}
+                onStatusChange={(status) => {
+                  setracaForm(status);
+                  console.log(status)
+                }}
+              />
+
+            </div>
 
             <FormDescription>
               Selecione a especie do animal.
@@ -512,16 +524,27 @@ export function AccountForm() {
         render={({ field }) => (
           <FormItem className="flex flex-col">
             <FormLabel>Selecione a raça do animal</FormLabel>
-            <ComboBoxResponsive
-              statuses={null}
-              texArea="raca"
-              IDFather={racaForm}
-              Formfather={null}
-              onStatusChange={(status) => {
-                field.onChange(status ? status.value : '');
-              }}
-              disabledfield={disabledfield}
-            />
+            <div className="flex">
+
+              <ComboBoxResponsive
+                statuses={null}
+                texArea="raca"
+                IDFather={racaForm}
+                Formfather={null}
+                onStatusChange={(status) => {
+                  field.onChange(status ? status.value : '');
+                }}
+                disabledfield={disabledfield}
+              />
+              <AddTags
+                tag="raça"
+                disabledfield={disabledfield}
+                onStatusChange={(status) => {
+                  setracaForm(status);
+                  console.log(status)
+                }}
+              />
+            </div>
             <FormDescription>
               Selecione a raça do animal.
             </FormDescription>
@@ -621,7 +644,7 @@ export function AccountForm() {
         <Button onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
-      
+
           Cookies.set('PacienteName', pacienteForm)
           const pacientId = String(pacientIdForm) || "";
           Cookies.set('PacienteID', pacientId)

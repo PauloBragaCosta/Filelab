@@ -12,20 +12,20 @@ datasource db {
 }
 
 model Paciente {
-  PacientId       Int      @id @default(autoincrement())
+  PacientId       Int          @id @default(autoincrement())
   nomeCompleto    String
   especieValue    String?
   sexoValue       String?
   dataNascimento  DateTime
   racaValue       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
   tutorId         String?
   ExameDoPaciente OriginExam[]
-  Tutor           Tutor?   @relation(fields: [tutorId], references: [idTutor])
-  Raca            Raca?    @relation(fields: [racaValue], references: [value])
-  Sexo            Sexo?    @relation(fields: [sexoValue], references: [value])
-  Especie         Especie? @relation(fields: [especieValue], references: [value])
+  Tutor           Tutor?       @relation(fields: [tutorId], references: [idTutor])
+  Raca            Raca?        @relation(fields: [racaValue], references: [value])
+  Sexo            Sexo?        @relation(fields: [sexoValue], references: [value])
+  Especie         Especie?     @relation(fields: [especieValue], references: [value])
 }
 
 model Especie {
@@ -58,7 +58,7 @@ model Tutor {
 }
 
 model Medico {
-  idMedico                  String  @id @default(uuid())
+  idMedico                  String       @id @default(uuid())
   nameMedico                String // Nome completo do médico
   telephoneMedico           String // Telefone do médico, incluindo o DDD
   emailMedico               String // Email do médico
@@ -69,22 +69,29 @@ model Medico {
   examedoMedico             OriginExam[]
 }
 
-
-
 model Storage {
-  value   String  @id @default(uuid())
+  value   String       @id @default(uuid())
   label   String?
   idExame OriginExam[]
 }
 
 model ExamType {
-  value   String  @id @default(uuid())
+  value   String       @id @default(uuid())
   label   String?
   idExame OriginExam[]
 }
 
+model Image {
+  id          String     @id @default(uuid())
+  tag         String
+  base64Image String
+  examId      Int
+  OriginExam  OriginExam @relation(fields: [examId], references: [idExame])
+}
+
 model OriginExam {
   idExame           Int       @id @default(autoincrement())
+  urgent            Boolean
   storageValue      String? // Tipo de amostra enviada (tubo, pote, lâmina, outros)
   storageQuantity   String? // Quantidade de frascos
   clinicalSuspicion String? // Suspeita clínica
@@ -97,4 +104,5 @@ model OriginExam {
   Medico            Medico?   @relation(fields: [medicoId], references: [idMedico])
   Storage           Storage?  @relation(fields: [storageValue], references: [value])
   ExamType          ExamType? @relation(fields: [exameTipo], references: [value])
+  Images            Image[] // Relation to multiple Image models
 }

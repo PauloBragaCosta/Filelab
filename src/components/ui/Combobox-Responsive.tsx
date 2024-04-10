@@ -176,7 +176,7 @@ export function ComboBoxResponsive({
         return (
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button disabled={disabledfieldany} variant="outline" className="w-[240px] justify-start text-muted-foreground">
+                    <Button disabled={disabledfieldany} variant="outline" className="w-[35rem] justify-start text-muted-foreground">
                         {selectedStatus ? <>{selectedStatus.label}</> : <>+ Selecione o {texArea}</>}
                     </Button>
                 </PopoverTrigger>
@@ -191,7 +191,7 @@ export function ComboBoxResponsive({
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button disabled={disabledfieldany} variant="outline" className="w-[240px] justify-start">
+                <Button disabled={disabledfieldany} variant="outline" className="w-[35rem] justify-start">
                     {selectedStatus ? <>{selectedStatus.label}</> : <>+ Selecione o {texArea}</>}
                 </Button>
             </DrawerTrigger>

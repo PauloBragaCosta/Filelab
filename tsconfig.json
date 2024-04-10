@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/tasks/print.ts", "src/pages/api/tasks/print.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/pages/api/tasks/print.ts", "src/pages/api/tasks/print.ts", "src/app/register/image/geminiIA..tsx"],
   "exclude": ["node_modules"]
 }
