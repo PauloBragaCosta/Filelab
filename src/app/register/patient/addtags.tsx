@@ -28,6 +28,8 @@ import { Label } from "../../../components/ui/label"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import { prisma } from "@/lib/prisma"
+import { revalidateTag } from "next/cache"
+// import executarFind from "@/components/ui/Combobox-Responsive"
 
 export function AddTags({
   tag,
@@ -69,11 +71,11 @@ export function AddTags({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="ghost">+ adicionar</Button>
+        <Button disabled={disabledfieldany} variant="ghost">+ adicionar</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>+ adicionar</DrawerTitle>
+          <DrawerTitle>Adicionar {tag}</DrawerTitle>
           <DrawerDescription>
             Insira o valor de {tag} para que seja registrado no banco de dados e incluído na lista de consultas do sistema.
           </DrawerDescription>
@@ -161,6 +163,10 @@ function ProfileForm({ className, tag, onStatusChange }: React.ComponentProps<"f
         },
       }
     );
+
+
+   
+
 
     onStatusChange(inputValue)
 

@@ -5,9 +5,10 @@ import { NextApiRequest, NextApiResponse } from "next"
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     let { nameTutor, telephoneTutor, emailTutor, communicationEmailsTutor, marketingEmailsTutor, socialWhatsappTutor} = req.body;
 
-   
 
-    await prisma.tutor.create({
+
+
+    const tutor = await prisma.tutor.create({
         data: {
             nameTutor,
             telephoneTutor,
@@ -18,5 +19,5 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         }
     });
 
-    return res.status(201).json({});
+    return res.status(201).json({idTutor: tutor.idTutor});
 }

@@ -51,13 +51,8 @@ export function ComboBoxResponsive({
     const [Data, setData] = React.useState<{ label: string, value: string }[]>([]);
 
 
-    const foundTutor = Data.find((r: { value: any }) => r.value === IDFather);
-
-  
     React.useEffect(() => {
-        if (foundTutor) {
-            setSelectedStatus(foundTutor);
-        }
+        find()
     }, [IDFather]);
 
     React.useEffect(() => {
@@ -69,28 +64,14 @@ export function ComboBoxResponsive({
         
     }, [disabledfield]);
 
-
-
     const handleStatusSelect = (status: Status | null) => {
         setSelectedStatus(status);
         onStatusChange(status);
     };
 
-    const [TutorState, setTutorState] = React.useState<Status | null>();
-
-
-    React.useEffect(() => {
-        if (TutorState) {
-            setSelectedStatus(TutorState);
-        }
-    }, [TutorState]);
-
     React.useEffect(() => {
         find()
     }, []);
-
-   
-
 
     async function find() {
         try {
@@ -115,6 +96,9 @@ export function ComboBoxResponsive({
                     value: post.idMedico,
                 }));
 
+                const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+                setSelectedStatus(foundTutor)
+
 
                 sessionStorage.setItem('MedicoData', JSON.stringify(formattedPosts));
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor
@@ -136,7 +120,7 @@ export function ComboBoxResponsive({
 
 
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
-                setTutorState(foundTutor)
+                setSelectedStatus(foundTutor)
 
 
                 sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
@@ -155,10 +139,8 @@ export function ComboBoxResponsive({
                     value: post.value,
                 }));
 
-                const foundRaça = formattedPosts.find((r: { value: any }) => r.value === IDFather);
-
-                console.log(foundRaça)
-
+                const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
+                setSelectedStatus(foundTutor)
 
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor
 
@@ -216,11 +198,6 @@ function StatusList({
     statuses: Status[]
     textArea: string
 }) {
-
-    React.useEffect(() => {
-
-        console.log(textArea)
-    });
     return (
         <Command>
             <CommandInput placeholder={`Filtrar ${textArea}...`} />
@@ -246,4 +223,3 @@ function StatusList({
         </Command>
     )
 }
-

@@ -7,7 +7,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
    
 
-    await prisma.medico.create({
+    const medico = await prisma.medico.create({
         data: {
             nameMedico,
             telephoneMedico,
@@ -19,5 +19,5 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         }
     });
 
-    return res.status(201).json({});
+    return res.status(201).json({idMedico: medico.idMedico});
 }

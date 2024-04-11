@@ -16,13 +16,6 @@ import {
 } from "../../../components/ui/form"
 
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card"
-
-import {
   PersonIcon,
 } from "@radix-ui/react-icons"
 
@@ -37,7 +30,6 @@ import {
 
 import { toast } from "../../../components/ui/use-toast"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { TutorForm } from "../tutor/tutor-form copy"
 import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import React, { useEffect, useState } from 'react';
 import { MedicoForm } from "../doctor/doctor-form copy"
@@ -46,6 +38,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { TabsCalendario } from "@/components/ui/TabsCalendario"
 import Cookies from 'js-cookie'
 import { AddTags } from "./addtags";
+import { AddTutor } from "./addtutor";
+import { AddMedico } from "./addMedico";
 
 
 
@@ -553,121 +547,111 @@ export function AccountForm() {
         )}
       />
 
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Tutor</CardTitle>
-          <CardContent className="p-0 center"><FormField
-            control={form.control}
-            name="tutorId"
-            render={({ field }) => (
-              //aqui 321
-              <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
-                <div className="flex flex-col">
-                  <ComboBoxResponsive
-                    statuses={null}
-                    texArea="Tutor"
-                    IDFather={tutorIDForm} // esse e o valor do tutor mas vai ser levado para a raça tb quando fazer o banco de dados parecido com o do medico e tutor
-                    Formfather={null}
-                    onStatusChange={(status) => {
-                      field.onChange(status ? status.value : '');
-                      setNameTutorfind(status?.label);
-                    }}
-                    disabledfield={disabledfield}
-                  />
-                  <FormDescription>
-                    Procure o nome do tutor
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-                <div className="mx-0">
-                  <AlertDialog >
-                    <AlertDialogTrigger asChild >
-                      <Button variant="outline">+ cadastrar</Button>
-                    </AlertDialogTrigger>
-                    <TutorForm onStatusChange={(newTutorName) => {
-                      setNameTutorfind(newTutorName);
-                    }} />
-                  </AlertDialog>
-                </div>
-              </FormItem>
-
-            )}
-          /></CardContent>
+      <FormField
+        control={form.control}
+        name="raca"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Selecione o tutor</FormLabel>
+            <div className="flex">
+              <ComboBoxResponsive
+                statuses={null}
+                texArea="Tutor"
+                IDFather={tutorIDForm}
+                Formfather={null}
+                onStatusChange={(status) => {
+                  field.onChange(status ? status.value : '');
+                  setNameTutorfind(status?.label);
+                }}
+                disabledfield={disabledfield}
+              />
+              <AddTutor
+                tag="tutor"
+                disabledfield={disabledfield}
+                onStatusChange={(status) => {
+                  setTutorIDForm(status);
+                  console.log(status)
+                }}
+              />
+            </div>
+            <FormDescription>
+              Selecione o nome do tutor.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
 
-          <CardTitle>Médico</CardTitle>
-          <CardContent className="p-0 center"><FormField
-            control={form.control}
-            name="medico"
-            render={({ field }) => (
-              <FormItem className="space-y-0 flex flex-row justify-between mx-0 object-top">
-                <div className="flex flex-col">
-                  <ComboBoxResponsive
-                    statuses={null}
-                    texArea="Medico"
-                    IDFather={null}
-                    Formfather={null}
-                    onStatusChange={(status) => {
-                      field.onChange(status ? status.value : '');
-                      setMedicoIDForm(status?.value)
-                      setNameMedicofind(status?.label)
-                    }}
-                    disabledfield={false}
-                  />
-                  <FormDescription>
-                    Procure o nome do Medico
-                  </FormDescription>
-                  {isVisible ? (<FormMessage>Seu texto aqui</FormMessage>) : (<FormMessage />)}
+      <FormField
+        control={form.control}
+        name="medico"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Selecione o Medico</FormLabel>
+              <div className="flex">
+                <ComboBoxResponsive
+                  statuses={null}
+                  texArea="Medico"
+                  IDFather={null}
+                  Formfather={null}
+                  onStatusChange={(status) => {
+                    field.onChange(status ? status.value : '');
+                    setMedicoIDForm(status?.value)
+                    setNameMedicofind(status?.label)
+                  }}
+                  disabledfield={false}
+                />
+                <AddMedico
+                tag="Medico"
+                disabledfield={false}
+                onStatusChange={(status) => {
+                  setTutorIDForm(status);
+                  console.log(status)
+                }}
+              />
+              </div>
+              <FormDescription>
+                Procure o nome do Medico
+              </FormDescription>
+              {isVisible ? (<FormMessage>Seu texto aqui</FormMessage>) : (<FormMessage />)}
+          </FormItem>
 
-                </div>
-                <div className="mx-0">
-                  <AlertDialog >
-                    <AlertDialogTrigger asChild >
-                      <Button variant="outline">+ cadastrar</Button>
-                    </AlertDialogTrigger>
-                    <MedicoForm onStatusChange={(newMedicoName) => {
-                      setNameMedicofind(newMedicoName); // Paulo muda isso pelo ID fica melhor igual o que faz com
-                    }} />
-                  </AlertDialog>
-                </div>
-              </FormItem>
-
-            )}
-          /></CardContent>
-        </CardHeader>
-      </Card>
+        )}
+      />
 
 
 
-      {condition ? (
-        <Button onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
+      {
+        condition ? (
+          <Button onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
 
-          Cookies.set('PacienteName', pacienteForm)
-          const pacientId = String(pacientIdForm) || "";
-          Cookies.set('PacienteID', pacientId)
-          if (MedicoIDForm !== undefined) {
-            Cookies.set('MedicoNameID', MedicoIDForm)
-          }
-          if (MedicoIDForm) {
-            router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${pacientIdForm}?MedicoNameID=${MedicoIDForm}?TutoreName=${nameTutorfind}`);
+            Cookies.set('PacienteName', pacienteForm)
+            const pacientId = String(pacientIdForm) || "";
+            Cookies.set('PacienteID', pacientId)
+            if (MedicoIDForm !== undefined) {
+              Cookies.set('MedicoNameID', MedicoIDForm)
+            }
+            if (MedicoIDForm) {
+              router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${pacientIdForm}?MedicoNameID=${MedicoIDForm}?TutoreName=${nameTutorfind}`);
 
-          } else {
-            setIsVisible(true);
-          }
-        }}
-          className="mt-4">
-          Proximo
-        </Button>
-      ) : (
-        <Button type="submit" onClick={form.handleSubmit(onSubmit)} className="mt-4">Salvar</Button>
-      )}
+            } else {
+              setIsVisible(true);
+            }
+          }}
+            className="mt-4" >
+            Proximo
+          </Button >
+        ) : (
+          <Button type="submit" onClick={form.handleSubmit(onSubmit)} className="mt-4">Salvar</Button>
+        )
+      }
 
 
 
-    </Form>
+    </Form >
 
   )
 }
