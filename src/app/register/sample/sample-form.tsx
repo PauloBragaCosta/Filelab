@@ -30,6 +30,9 @@ import React from 'react';
 import { ComboBoxResponsive } from "@/components/ui/Combobox-Responsive"
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation';
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { AddTags } from "../patient/addtags"
 
 
 // const amostraType = [
@@ -90,6 +93,7 @@ const accountFormSchema = z.object({
   examType: z.string({
     required_error: "Please select a species.",
   }),
+  urgent: z.boolean().default(false).optional()
 })
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
@@ -120,7 +124,7 @@ export function SampleForm() {
 
 
   async function onSubmit(data: AccountFormValues) {
-    
+
     setdataForm(data.DateTimeColeta)
     const body = {
       data,
@@ -160,20 +164,47 @@ export function SampleForm() {
     <Form {...form}>
       <FormField
         control={form.control}
+        name="urgent"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+              <Label htmlFor="urgent">Amostra urgente</Label>
+            </div>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="amostraType"
         render={({ field }) => (
           <FormItem className="flex flex-col">
             <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
-            <ComboBoxResponsive
-              statuses={null}
-              texArea="storage"
-              IDFather={amostraForm}
-              Formfather={null}
-              onStatusChange={(status) => {
-                field.onChange(status ? status.value : '');
-              }}
-              disabledfield={null}
-            />
+            <div className="flex">
+              <ComboBoxResponsive
+                statuses={null}
+                texArea="storage"
+                IDFather={amostraForm}
+                Formfather={null}
+                onStatusChange={(status) => {
+                  field.onChange(status ? status.value : '');
+                }}
+                disabledfield={null}
+              />
+
+              <AddTags
+                tag="tipo de armazenamento"
+                disabledfield={false}
+                onStatusChange={(status) => {
+                  setAmostraForm(status);
+                  console.log(status)
+                }}
+              />
+            </div>
             <FormMessage />
           </FormItem>
         )}

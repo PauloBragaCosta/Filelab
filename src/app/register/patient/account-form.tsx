@@ -25,14 +25,13 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandInputSearch,
   CommandList,
 } from "../../../components/ui/command"
 
 import { toast } from "../../../components/ui/use-toast"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import React, { useEffect, useState } from 'react';
-import { MedicoForm } from "../doctor/doctor-form copy"
 import { ComboBoxResponsive, Status } from "@/components/ui/Combobox-Responsive"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TabsCalendario } from "@/components/ui/TabsCalendario"
@@ -40,7 +39,19 @@ import Cookies from 'js-cookie'
 import { AddTags } from "./addtags";
 import { AddTutor } from "./addtutor";
 import { AddMedico } from "./addMedico";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronDownIcon, SearchIcon, Bird, Rabbit, Turtle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { truncate } from "fs";
 
 
 
@@ -72,7 +83,7 @@ const accountFormSchema = z.object({
   tutorId: z.string({
     required_error: "Please select a species.",
   }),
-  medico: z.string({
+  medicoId: z.string({
     required_error: "Please select a species.",
   }),
 })
@@ -98,6 +109,17 @@ export function AccountForm() {
   const [nameTutorfind, setNameTutorfind] = React.useState<string | undefined>("")
 
   const [isVisible, setIsVisible] = useState(false);
+  const [cadastroisVisible, setCadastroIsVisible] = useState(false);
+
+ 
+  React.useEffect(() => {
+    if (pacienteForm !== "") {
+      setCadastroIsVisible(true);
+      console.log(pacienteForm);
+    }
+  }, [pacienteForm]);
+  
+
 
 
   const [dataPaciente, setDataPaciente] = useState<{
@@ -124,11 +146,11 @@ export function AccountForm() {
 
   // This can come from your database or API.
   const defaultValues: Partial<AccountFormValues> = {
-    //nomeCompleto: "pacientes",
+    nomeCompleto: "pacientes",
     // dataNascimento: new Date("2023-01-23"),
-    // raca: "yorkshire",
-    //especieValue: "canino",
-    //sexo: sexoForm,
+    // raca: "teste-02",
+    // especieValue: "teste-07",
+    // sexo: "Femea",
   }
 
   const router = useRouter();
@@ -216,6 +238,7 @@ export function AccountForm() {
 
 
   async function onSubmit(data: AccountFormValues) {
+    console.log(data)
     if (pacientIdForm === 0) {
       // Armazene os dados do paciente no localStorage
       //sessionStorage.setItem('pacienteData', JSON.stringify(data));
@@ -230,7 +253,7 @@ export function AccountForm() {
 
       // Converte a resposta para JSON
       const responseData = await response.json();
-      const medicoID = (data.medico);
+      const medicoID = (data.medicoId);
 
 
       // Agora você pode acessar o PacientId
@@ -261,7 +284,7 @@ export function AccountForm() {
   }
 
 
-  const [disabledfield, setdisabled] = React.useState(true)
+  const [disabledfield, setdisabled] = React.useState(false)
 
 
 
@@ -295,300 +318,292 @@ export function AccountForm() {
 
 
 
+
   return (
 
     <Form {...form}>
-      {/* {iAForm &&
-        <div className="">
-          <button className="w-[200px] h-[30px] rounded-full items-center border-2 pulse-button hover:border-transparent hover:animate-[pulsecolor_5s_ease-in-out_infinite]" onClick={preencherFormulario}>
-            <div className="flex items-center justify-content-end gap-1 ml-2">
-              <SparklesIcon className="text-gray-600" />
-              <h1 className="text-gray-800">Preencher Formulário</h1>
-            </div>
-          </button>
-        </div>
-      } */}
-
-
-
-
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
       <FormField
-        control={form.control}
-        name="nomeCompleto"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Paciente</FormLabel>
-            <FormControl>
-              <Command className="rounded-lg border shadow-md h-35">
+          control={form.control}
+          name="nomeCompleto"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Paciente</FormLabel>
+              <FormControl>
+                <Command className="rounded-lg border shadow-md h-35">
 
-                <div className="flex">
-                  <CommandInput placeholder="Digite ou pesquise o nome do animal..." value={pacienteForm} onValueChange={handleValueChange} />
-                  <div className="border-b">
-                    <Button variant="ghost" className="flex-none my-3 mr-4" onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      field.onChange('');
-                      setdisabled(true);
-                      setPacienteForm('');
-                      setEspecieForm("");
-                      setsexoForm("");
-                      setracaForm("");
-                      setTutorIDForm("");
-                      setMedicoIDForm("");
-                      setPacientIdForm(0);
-                      setDataForm(undefined)
-                      setCondition(false)
+                  <div className="flex">
+                    <CommandInput placeholder="Digite ou pesquise o nome do animal..." value={pacienteForm} onValueChange={handleValueChange} />
+                    <div className="border-b">
+                      <Button variant="ghost" className="flex-none my-3 mr-4" onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        field.onChange('');
+                        setdisabled(true);
+                        setPacienteForm('');
+                        setEspecieForm("");
+                        setsexoForm("");
+                        setracaForm("");
+                        setTutorIDForm("");
+                        setMedicoIDForm("");
+                        setPacientIdForm(0);
+                        setDataForm(undefined)
+                        setCondition(false)
+                        setCadastroIsVisible(false)
 
-                    }}>apagar</Button>
+                      }}>apagar</Button>
+                    </div>
+                    {cadastroisVisible ? (
+                      <Button className="flex-none my-3 mr-4" onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setdisabled(false);
+                        setPacientIdForm(0);
+                        setEspecieForm("");
+                        setsexoForm("");
+                        setracaForm("");
+                        setTutorIDForm("");
+                        setMedicoIDForm("");
+                        setDataForm(undefined);
+                        field.onChange(pacienteForm);
+                        setCondition(false)
 
-
+                      }}>Cadastrar</Button>
+                    ) : (<></>)}
                   </div>
-                </div>
 
-                <CommandList>
-                  <CommandEmpty>
-                    <h1>Não foram encontrados pacientes com esse mesmo nome.</h1>
-                    <Button variant="ghost" className="flex-none my-3 mr-4" onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      setdisabled(false);
-                      setPacientIdForm(0);
-                      setEspecieForm("");
-                      setsexoForm("");
-                      setracaForm("");
-                      setTutorIDForm("");
-                      setMedicoIDForm("");
-                      setDataForm(undefined);
-                      field.onChange(pacienteForm);
-                      setCondition(false)
+                  <CommandList>
+                    <CommandEmpty>
+                      <h1>Não foram encontrados pacientes com esse mesmo nome.</h1>
+                    </CommandEmpty>
 
-                    }}>Cadastrar</Button>
-                  </CommandEmpty>
+                    <ScrollArea className="w-full rounded-md border">
+                      <CommandGroup heading="Nomes encontrados no sistema">
+                        {dataPaciente.map((statusItem) => (
+                          <CommandItem
+                            key={statusItem.PacientId}
+                            value={statusItem.nomeCompleto}
+                            onSelect={(value) => {
+                              // Atualize o valor do campo de entrada
+                              field.onChange(value)
+                              // Verifique se o valor do campo de entrada foi atualizado
+                              setPacienteForm(value);
 
-                  <ScrollArea className="w-full rounded-md border">
-                    <CommandGroup heading="Nomes encontrados no sistema">
-                      {dataPaciente.map((statusItem) => (
-                        <CommandItem
-                          key={statusItem.PacientId}
-                          value={statusItem.nomeCompleto}
-                          onSelect={(value) => {
-                            // Atualize o valor do campo de entrada
-                            field.onChange(value)
-                            // Verifique se o valor do campo de entrada foi atualizado
-                            setPacienteForm(value);
-
-                            setEspecieForm(statusItem.especieValue);
+                              setEspecieForm(statusItem.especieValue);
 
 
-                            setsexoForm(statusItem.sexoValue);
+                              setsexoForm(statusItem.sexoValue);
 
-                            setracaForm(statusItem.racaValue);
+                              setracaForm(statusItem.racaValue);
 
-                            setTutorIDForm(statusItem.tutorId);
-                            Cookies.set('TutoreName', statusItem.tutorId)
-                            setMedicoIDForm("");
+                              setTutorIDForm(statusItem.tutorId);
+                              Cookies.set('TutoreName', statusItem.tutorId)
+                              setMedicoIDForm("");
 
 
-                            Dataformat(statusItem.dataNascimento)
-                            setDataForm(statusItem.dataNascimento)
+                              Dataformat(statusItem.dataNascimento)
+                              setDataForm(statusItem.dataNascimento)
 
 
 
-                            setPacientIdForm(statusItem.PacientId)
+                              setPacientIdForm(statusItem.PacientId)
 
-                            setdisabled(true);
-                            setCondition(true)
+                              setdisabled(true);
+                              setCondition(true)
 
-                          }}
-                        >
-                          <PersonIcon className="mr-2 h-4 w-4" />
-                          <span>Nº {statusItem.PacientId} - {statusItem.nomeCompleto}</span>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </ScrollArea>
-                </CommandList>
-              </Command>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                              setCadastroIsVisible(false)
+
+                            }}
+                          >
+                            <PersonIcon className="mr-2 h-4 w-4" />
+                            <span>Nº {statusItem.PacientId} - {statusItem.nomeCompleto}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </ScrollArea>
+                  </CommandList>
+                </Command>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
 
 
 
 
-      <FormField
-        control={form.control}
-        name="especieValue"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Selecione a especie do animal</FormLabel>
-            <div className="flex">
-              <ComboBoxResponsive
-                statuses={null}
-                texArea="especie"
-                IDFather={especieForm}
-                Formfather={null}
+          
+        <FormField
+          control={form.control}
+          name="especieValue"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Selecione a especie do animal</FormLabel>
+              <div className="flex">
+                <ComboBoxResponsive
+                  statuses={null}
+                  texArea="especie"
+                  IDFather={especieForm}
+                  Formfather={null}
+                  onStatusChange={(status) => {
+                    field.onChange(status ? status.value : '');
+                  }}
+                  disabledfield={disabledfield}
+                />
+                <AddTags
+                  tag="especie"
+                  disabledfield={disabledfield}
+                  onStatusChange={(status) => {
+                    setracaForm(status);
+                    console.log(status)
+                  }}
+                />
+
+              </div>
+
+              <FormDescription>
+                Selecione a especie do animal.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+
+
+        <FormField
+          control={form.control}
+          name="sexo"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel>Sexo do animal</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  value={sexoForm || field.value}
+                  className="flex flex-col space-y-1"
+                >
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="Macho" disabled={disabledfield} />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      Macho
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="Femea" disabled={disabledfield} />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      Fêmea
+                    </FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="dataNascimento"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Idade Anos Meses</FormLabel>
+              <TabsCalendario
+                IDFather={DataForm}
                 onStatusChange={(status) => {
-                  field.onChange(status ? status.value : '');
-                }}
-                disabledfield={disabledfield}
-              />
-              <AddTags
-                tag="especie"
-                disabledfield={disabledfield}
-                onStatusChange={(status) => {
-                  setracaForm(status);
-                  console.log(status)
-                }}
-              />
+                  field.onChange(status ? status : '');
+                }} />
+              <FormDescription>
 
-            </div>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormDescription>
-              Selecione a especie do animal.
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name="raca"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Selecione a raça do animal</FormLabel>
+              <div className="flex">
 
+                <ComboBoxResponsive
+                  statuses={null}
+                  texArea="raca"
+                  IDFather={racaForm}
+                  Formfather={null}
+                  onStatusChange={(status) => {
+                    field.onChange(status ? status.value : '');
+                  }}
+                  disabledfield={disabledfield}
+                />
+                <AddTags
+                  tag="raça"
+                  disabledfield={disabledfield}
+                  onStatusChange={(status) => {
+                    setracaForm(status);
+                    console.log(status)
+                  }}
+                />
+              </div>
+              <FormDescription>
+                Selecione a raça do animal.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-
-      <FormField
-        control={form.control}
-        name="sexo"
-        render={({ field }) => (
-          <FormItem className="space-y-3">
-            <FormLabel>Sexo do animal</FormLabel>
-            <FormControl>
-              <RadioGroup
-                onValueChange={field.onChange}
-                value={sexoForm || field.value}
-                className="flex flex-col space-y-1"
-              >
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="Macho" disabled={disabledfield} />
-                  </FormControl>
-                  <FormLabel className="font-normal">
-                    Macho
-                  </FormLabel>
-                </FormItem>
-                <FormItem className="flex items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <RadioGroupItem value="Femea" disabled={disabledfield} />
-                  </FormControl>
-                  <FormLabel className="font-normal">
-                    Fêmea
-                  </FormLabel>
-                </FormItem>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="dataNascimento"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Idade Anos Meses</FormLabel>
-            <TabsCalendario
-              IDFather={DataForm}
-              onStatusChange={(status) => {
-                field.onChange(status ? status : '');
-              }} />
-            <FormDescription>
-
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="raca"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Selecione a raça do animal</FormLabel>
-            <div className="flex">
-
-              <ComboBoxResponsive
-                statuses={null}
-                texArea="raca"
-                IDFather={racaForm}
-                Formfather={null}
-                onStatusChange={(status) => {
-                  field.onChange(status ? status.value : '');
-                }}
-                disabledfield={disabledfield}
-              />
-              <AddTags
-                tag="raça"
-                disabledfield={disabledfield}
-                onStatusChange={(status) => {
-                  setracaForm(status);
-                  console.log(status)
-                }}
-              />
-            </div>
-            <FormDescription>
-              Selecione a raça do animal.
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="raca"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Selecione o tutor</FormLabel>
-            <div className="flex">
-              <ComboBoxResponsive
-                statuses={null}
-                texArea="Tutor"
-                IDFather={tutorIDForm}
-                Formfather={null}
-                onStatusChange={(status) => {
-                  field.onChange(status ? status.value : '');
-                  setNameTutorfind(status?.label);
-                }}
-                disabledfield={disabledfield}
-              />
-              <AddTutor
-                tag="tutor"
-                disabledfield={disabledfield}
-                onStatusChange={(status) => {
-                  setTutorIDForm(status);
-                  console.log(status)
-                }}
-              />
-            </div>
-            <FormDescription>
-              Selecione o nome do tutor.
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name="tutorId"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Selecione o tutor</FormLabel>
+              <div className="flex">
+                <ComboBoxResponsive
+                  statuses={null}
+                  texArea="Tutor"
+                  IDFather={tutorIDForm}
+                  Formfather={null}
+                  onStatusChange={(status) => {
+                    field.onChange(status ? status.value : '');
+                    setNameTutorfind(status?.label);
+                  }}
+                  disabledfield={disabledfield}
+                />
+                <AddTutor
+                  tag="tutor"
+                  disabledfield={disabledfield}
+                  onStatusChange={(status) => {
+                    setTutorIDForm(status);
+                    console.log(status)
+                  }}
+                />
+              </div>
+              <FormDescription>
+                Selecione o nome do tutor.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
 
-      <FormField
-        control={form.control}
-        name="medico"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Selecione o Medico</FormLabel>
+        <FormField
+          control={form.control}
+          name="medicoId"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Selecione o Medico</FormLabel>
               <div className="flex">
                 <ComboBoxResponsive
                   statuses={null}
@@ -603,26 +618,24 @@ export function AccountForm() {
                   disabledfield={false}
                 />
                 <AddMedico
-                tag="Medico"
-                disabledfield={false}
-                onStatusChange={(status) => {
-                  setTutorIDForm(status);
-                  console.log(status)
-                }}
-              />
+                  tag="Medico"
+                  disabledfield={false}
+                  onStatusChange={(status) => {
+                    setTutorIDForm(status);
+                    console.log(status)
+                  }}
+                />
               </div>
               <FormDescription>
                 Procure o nome do Medico
               </FormDescription>
               {isVisible ? (<FormMessage>Seu texto aqui</FormMessage>) : (<FormMessage />)}
-          </FormItem>
+            </FormItem>
 
-        )}
-      />
+          )}
+        />
 
-
-
-      {
+{
         condition ? (
           <Button onClick={(event) => {
             event.preventDefault();
@@ -645,13 +658,17 @@ export function AccountForm() {
             Proximo
           </Button >
         ) : (
-          <Button type="submit" onClick={form.handleSubmit(onSubmit)} className="mt-4">Salvar</Button>
+          <Button type="submit">Salvar</Button>
         )
       }
 
 
 
+        
+      </form>
     </Form >
+
+
 
   )
 }

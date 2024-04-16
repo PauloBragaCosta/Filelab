@@ -14,9 +14,17 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 label: datatag,
             }
         });
-    
+
     if (tag == "especie")
         await prisma.especie.create({
+            data: {
+                value: inputValue,
+                label: datatag,
+            }
+        });
+
+    if (tag == "tipo de armazenamento")
+        await prisma.storage.create({
             data: {
                 value: inputValue,
                 label: datatag,
