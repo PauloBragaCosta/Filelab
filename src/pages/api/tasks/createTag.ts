@@ -31,6 +31,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             }
         });
 
+    if (tag == "tipo de exame")
+        await prisma.examType.create({
+            data: {
+                value: inputValue,
+                label: datatag,
+            }
+        });
+
 
     return res.status(201).json({});
 }

@@ -309,17 +309,28 @@ export function SampleForm() {
         name="examType"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Selecione o tipo de armazenamento da amostra</FormLabel>
-            <ComboBoxResponsive
-              statuses={null}
-              texArea="exam"
-              IDFather={amostraForm}
-              Formfather={null}
-              onStatusChange={(status) => {
-                field.onChange(status ? status.value : '');
-              }}
-              disabledfield={null}
-            />
+            <FormLabel>Selecione o tipo de exame</FormLabel>
+            <div className="flex">
+              <ComboBoxResponsive
+                statuses={null}
+                texArea="exame"
+                IDFather={amostraForm}
+                Formfather={null}
+                onStatusChange={(status) => {
+                  field.onChange(status ? status.value : '');
+                }}
+                disabledfield={null}
+              />
+
+              <AddTags
+                tag="tipo de exame"
+                disabledfield={false}
+                onStatusChange={(status) => {
+                  setAmostraForm(status);
+                  console.log(status)
+                }}
+              />
+            </div>
             <FormMessage />
           </FormItem>
         )}
