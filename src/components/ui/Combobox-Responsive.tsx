@@ -20,6 +20,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import Cookies from 'js-cookie'
 
 export type Status = {
     value: string
@@ -53,24 +54,27 @@ export function ComboBoxResponsive({
 
     React.useEffect(() => {
         find()
+
     }, [IDFather]);
 
     React.useEffect(() => {
         setdisabled(disabledfield);
 
         if (IDFather === "invalido") {
-        setdisabled(false);
+            setdisabled(false);
         }
-        
+
     }, [disabledfield]);
 
     const handleStatusSelect = (status: Status | null) => {
         setSelectedStatus(status);
         onStatusChange(status);
+        console.log(selectedStatus)
     };
 
     React.useEffect(() => {
         find()
+
     }, []);
 
     async function find() {
@@ -100,6 +104,7 @@ export function ComboBoxResponsive({
                 setSelectedStatus(foundTutor)
 
 
+
                 sessionStorage.setItem('MedicoData', JSON.stringify(formattedPosts));
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor
 
@@ -121,6 +126,9 @@ export function ComboBoxResponsive({
 
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
                 setSelectedStatus(foundTutor)
+                Cookies.set(`${texArea}`, foundTutor.label || "")
+
+
 
 
                 sessionStorage.setItem('TutorData', JSON.stringify(formattedPosts));
@@ -141,6 +149,9 @@ export function ComboBoxResponsive({
 
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
                 setSelectedStatus(foundTutor)
+                if(texArea === "especie") {
+                    Cookies.set(`${texArea}`, foundTutor.label)
+                }
 
                 setData(formattedPosts); // Atualiza o estado com os dados do tutor
 

@@ -32,7 +32,7 @@ import {
 
 import React, { useState } from "react"
 import { Calendar } from "./calendar"
-import { addDays, addMonths, addYears, differenceInDays, differenceInMonths, differenceInYears, format, subDays, subMonths, subYears } from "date-fns"
+import { addDays, addMonths, addYears, differenceInDays, differenceInMonths, differenceInYears, format, parseISO, subDays, subMonths, subYears } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Badge } from "./badge"
 import { ptBR } from "date-fns/locale"
@@ -77,10 +77,14 @@ export function TabsCalendario({
     const [monthInput, setmonthInput] = useState(0);  // valor do input de meses
     const [dayInput, setdayInput] = useState(0); // valor do input de dias
 
-    // Calcular a diferença em anos, meses e dias
-    let years = differenceInYears(currentDate, selectedDate)
-    let months = differenceInMonths(currentDate, selectedDate) % 12
-    let days = differenceInDays(currentDate, selectedDate) % 365 % 30
+    //corrigir esse erro depois
+
+    // Calcule a diferença em anos, meses e dias
+    let years = differenceInYears(currentDate, selectedDate);
+    let months = differenceInMonths(currentDate, selectedDate) % 12;
+    let days = differenceInDays(currentDate, selectedDate) % 365 % 30;
+
+
 
     React.useEffect(() => {
         setyearInput(years)

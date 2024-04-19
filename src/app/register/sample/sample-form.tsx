@@ -33,6 +33,7 @@ import { useRouter } from 'next/navigation';
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { AddTags } from "../patient/addtags"
+import { stringify } from "postcss"
 
 
 // const amostraType = [
@@ -80,7 +81,7 @@ const accountFormSchema = z.object({
   }),
   observation: z.string({
     required_error: "Please select a observation.",
-  }),
+  }).optional(),
   amostraType: z.string({
     required_error: "Please select a species.",
   }),
@@ -89,7 +90,7 @@ const accountFormSchema = z.object({
   }),
   clinicalSuspicion: z.string({
     required_error: "Please select a species.",
-  }),
+  }).optional(),
   examType: z.string({
     required_error: "Please select a species.",
   }),
@@ -124,6 +125,7 @@ export function SampleForm() {
 
 
   async function onSubmit(data: AccountFormValues) {
+    console.log(data)
 
     setdataForm(data.DateTimeColeta)
     const body = {
@@ -142,6 +144,10 @@ export function SampleForm() {
     // Converte a resposta para JSON
     const responseData = await response.json();
     Cookies.set('idExame', responseData.idExame)
+
+    const isUrgent = String(data.urgent);
+    Cookies.set('IsUrgent', isUrgent)
+
     Cookies.set('DateTimeColeta', `${data.DateTimeColeta.getDate()}/${data.DateTimeColeta.getMonth()}/${data.DateTimeColeta.getFullYear()}`)
     router.push('/register/printer');
 
@@ -232,7 +238,7 @@ export function SampleForm() {
         name="clinicalSuspicion"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Suspeita clínica</FormLabel>
+            <FormLabel>Suspeita clínica (opcional)</FormLabel>
             <FormControl>
               <Input placeholder="  " {...field || ''} />
             </FormControl>
@@ -249,7 +255,7 @@ export function SampleForm() {
         name="observation"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Observação </FormLabel>
+            <FormLabel>Observação (opcional) </FormLabel>
             <FormControl>
               <Textarea placeholder="Histórico, sinais clínicos, tratamento submetido" {...field || ''} />
             </FormControl>

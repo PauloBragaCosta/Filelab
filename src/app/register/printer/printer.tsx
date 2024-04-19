@@ -14,11 +14,16 @@ import QRCode from 'qrcode'
 export function PrinterForm() {
   const PacienteName = Cookies.get('PacienteName')
 
-  const TutoreName = Cookies.get('TutoreName')
+  const TutoreName = Cookies.get('Tutor')
 
   const idExame = Cookies.get('idExame')
 
   const DateTimeColeta = Cookies.get('DateTimeColeta')
+
+  const EspecieValue = Cookies.get('especie')
+
+  const IsUrgent = Cookies.get('IsUrgent')
+
 
 
 
@@ -84,6 +89,7 @@ export function PrinterForm() {
     infoDiv.style.display = 'flex';
     infoDiv.style.flexDirection = 'column';
     infoDiv.style.alignItems = "center";
+    infoDiv.style.marginTop = "-24px"
     div.appendChild(infoDiv);
 
     const patientName = document.createElement('p');
@@ -101,7 +107,12 @@ export function PrinterForm() {
     tutorDiv.style.height = "30px";
     tutorDiv.style.backgroundColor = '#000';
     tutorDiv.style.borderRadius = '5px';
-    tutorDiv.style.padding = '2px';
+    tutorDiv.style.padding = '1px';
+
+    const especieValue = document.createElement('p');
+    especieValue.textContent = `Especie: ${EspecieValue}`; // Substitua pelo nome do tutor
+    especieValue.style.marginBottom = '0px'; // Adicione esta linha
+    infoDiv.appendChild(especieValue);
 
     const tutorName = document.createElement('p');
     tutorName.textContent = `Tutor: ${TutoreName}`; // Substitua pelo nome do tutor
@@ -113,6 +124,7 @@ export function PrinterForm() {
     collectionDate.style.marginBottom = '10px'; // Adicione esta linha
     infoDiv.appendChild(collectionDate);
 
+    if(IsUrgent === "true") {
     const urgencyDiv = document.createElement('div');
     urgencyDiv.style.display = 'flex';
     urgencyDiv.style.justifyContent = 'center';
@@ -128,9 +140,13 @@ export function PrinterForm() {
     urgency.style.marginBottom = '20px';
     urgency.style.fontWeight = 'bold';
     urgency.style.color = '#FFFFFF';
-
     urgencyDiv.appendChild(urgency);
+
+
     infoDiv.appendChild(urgencyDiv);
+    }
+
+    
 
     // Adicione o div ao corpo do documento
     document.body.appendChild(div);
@@ -214,6 +230,8 @@ export function PrinterForm() {
         </TabsContent>
       </Tabs>
     </div>
+
+    
   )
 }
 

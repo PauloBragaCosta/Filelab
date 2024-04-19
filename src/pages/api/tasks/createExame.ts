@@ -2,9 +2,9 @@ import { prisma } from "../../../lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  let { datalog, PacienteID, MedicoNameID } = req.body;
+  let { data, PacienteID, MedicoNameID } = req.body;
 
-  let { amostraType, storageQuantity, clinicalSuspicion, observation, DateTimeColeta, examType } = datalog
+  let { amostraType, storageQuantity, clinicalSuspicion, observation, DateTimeColeta, examType, urgent} = data
 
 
 
@@ -21,7 +21,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       exameTipo: examType,
       IdPaciente: pacientIdNumber,
       medicoId: MedicoNameID,
-      urgent: true,
+      urgent: urgent,
     }
   });
 

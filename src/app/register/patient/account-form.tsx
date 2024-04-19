@@ -52,6 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { truncate } from "fs";
+import { is } from "date-fns/locale";
 
 
 
@@ -64,33 +65,53 @@ const especie: Status[] = [
 ] as const;
 
 
-const accountFormSchema = z.object({
-  nomeCompleto: z.string({
-    required_error: "Escreva um nome valido",
-  }),
-  dataNascimento: z.date({
-    required_error: "A date of birth is required.",
-  }),
-  raca: z.string({
-    required_error: "Please select a breed.",
-  }),
-  especieValue: z.string({
-    required_error: "Please select a species.",
-  }),
-  sexo: z.string({
-    required_error: "Please select a species.",
-  }),
-  tutorId: z.string({
-    required_error: "Please select a species.",
-  }),
-  medicoId: z.string({
-    required_error: "Please select a species.",
-  }),
-})
-
-type AccountFormValues = z.infer<typeof accountFormSchema>
 
 export function AccountForm() {
+
+  const [schemaOn, setSchemaOn] = useState(false);
+
+
+  const accountFormSchema = z.object({
+    nomeCompleto: schemaOn ? z.string({
+      required_error: "Escreva um nome valido",
+    }).optional() : z.string({
+      required_error: "Escreva um nome valido",
+    }),
+    dataNascimento: schemaOn ? z.date({
+      required_error: "A date of birth is required.",
+    }).optional() : z.date({
+      required_error: "A date of birth is required.",
+    }).optional(),
+    raca: schemaOn ? z.string({
+      required_error: "Please select a breed.",
+    }).optional() : z.string({
+      required_error: "Please select a breed.",
+    }),
+    especieValue: schemaOn ? z.string({
+      required_error: "Please select a species.",
+    }).optional() : z.string({
+      required_error: "Please select a species.",
+    }),
+    sexo: schemaOn ? z.string({
+      required_error: "Please select a species.",
+    }).optional() : z.string({
+      required_error: "Please select a species.",
+    }),
+    tutorId: schemaOn ? z.string({
+      required_error: "Please select a species.",
+    }).optional() : z.string({
+      required_error: "Please select a species.",
+    }),
+    medicoId: z.string({
+      required_error: "Please select a species.",
+    }),
+  })
+
+  type AccountFormValues = z.infer<typeof accountFormSchema>
+
+
+
+
 
 
   const [sexoForm, setsexoForm] = useState("");
@@ -111,14 +132,14 @@ export function AccountForm() {
   const [isVisible, setIsVisible] = useState(false);
   const [cadastroisVisible, setCadastroIsVisible] = useState(false);
 
- 
+
   React.useEffect(() => {
     if (pacienteForm !== "") {
       setCadastroIsVisible(true);
       console.log(pacienteForm);
     }
   }, [pacienteForm]);
-  
+
 
 
 
@@ -233,44 +254,32 @@ export function AccountForm() {
   }
 
 
-  const [pacientIdForm, setPacientIdForm] = useState(0)
+
 
 
 
   async function onSubmit(data: AccountFormValues) {
-    console.log(data)
-    if (pacientIdForm === 0) {
-      // Armazene os dados do paciente no localStorage
-      //sessionStorage.setItem('pacienteData', JSON.stringify(data));
-
-      const response = await fetch('/api/tasks/create', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      // Converte a resposta para JSON
-      const responseData = await response.json();
-      const medicoID = (data.medicoId);
 
 
-      // Agora você pode acessar o PacientId
-      setPacientIdForm(responseData.IdPaciente)
+    // Armazene os dados do paciente no localStorage
+    //sessionStorage.setItem('pacienteData', JSON.stringify(data));
 
-
-      Cookies.set('PacienteName', pacienteForm)
-      Cookies.set('PacienteID', responseData.IdPaciente)
-      Cookies.set('MedicoNameID', medicoID)
-      if (nameTutorfind !== undefined) {
-        Cookies.set('TutoreName', nameTutorfind)
+    const response = await fetch('/api/tasks/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
       }
+    });
 
-      // Redirecione para a página do tutor
-      router.push(`/register/sample?PacienteID=${responseData.IdPaciente}`);
+    // Converte a resposta para JSON
+    const responseData = await response.json();
 
-    }
+    Cookies.set('PacienteID', responseData.IdPaciente)
+
+    // Redirecione para a página do tutor
+    router.push(`/register/sample?PacienteID=${responseData.IdPaciente}`);
+
 
     toast({
       title: "You submitted the following values:",
@@ -324,7 +333,7 @@ export function AccountForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-      <FormField
+        <FormField
           control={form.control}
           name="nomeCompleto"
           render={({ field }) => (
@@ -347,7 +356,6 @@ export function AccountForm() {
                         setracaForm("");
                         setTutorIDForm("");
                         setMedicoIDForm("");
-                        setPacientIdForm(0);
                         setDataForm(undefined)
                         setCondition(false)
                         setCadastroIsVisible(false)
@@ -359,7 +367,6 @@ export function AccountForm() {
                         event.preventDefault();
                         event.stopPropagation();
                         setdisabled(false);
-                        setPacientIdForm(0);
                         setEspecieForm("");
                         setsexoForm("");
                         setracaForm("");
@@ -385,10 +392,12 @@ export function AccountForm() {
                             key={statusItem.PacientId}
                             value={statusItem.nomeCompleto}
                             onSelect={(value) => {
+                              setSchemaOn(true)
                               // Atualize o valor do campo de entrada
                               field.onChange(value)
                               // Verifique se o valor do campo de entrada foi atualizado
                               setPacienteForm(value);
+                              Cookies.set('PacienteName', value)
 
                               setEspecieForm(statusItem.especieValue);
 
@@ -398,7 +407,8 @@ export function AccountForm() {
                               setracaForm(statusItem.racaValue);
 
                               setTutorIDForm(statusItem.tutorId);
-                              Cookies.set('TutoreName', statusItem.tutorId)
+
+                              
                               setMedicoIDForm("");
 
 
@@ -407,7 +417,8 @@ export function AccountForm() {
 
 
 
-                              setPacientIdForm(statusItem.PacientId)
+
+                              Cookies.set('PacienteID', String(statusItem.PacientId))
 
                               setdisabled(true);
                               setCondition(true)
@@ -434,7 +445,7 @@ export function AccountForm() {
 
 
 
-          
+
         <FormField
           control={form.control}
           name="especieValue"
@@ -449,6 +460,8 @@ export function AccountForm() {
                   Formfather={null}
                   onStatusChange={(status) => {
                     field.onChange(status ? status.value : '');
+                    Cookies.set('EspecieValue', status ? status.label : '')
+                    console.log(status)
                   }}
                   disabledfield={disabledfield}
                 />
@@ -577,6 +590,8 @@ export function AccountForm() {
                   onStatusChange={(status) => {
                     field.onChange(status ? status.value : '');
                     setNameTutorfind(status?.label);
+                    
+                  
                   }}
                   disabledfield={disabledfield}
                 />
@@ -585,7 +600,8 @@ export function AccountForm() {
                   disabledfield={disabledfield}
                   onStatusChange={(status) => {
                     setTutorIDForm(status);
-                    console.log(status)
+
+
                   }}
                 />
               </div>
@@ -614,6 +630,9 @@ export function AccountForm() {
                     field.onChange(status ? status.value : '');
                     setMedicoIDForm(status?.value)
                     setNameMedicofind(status?.label)
+                    Cookies.set('MedicoNameID', status ? status.value : '')
+                    Cookies.set('MedicoName', status ? status.label : '')
+
                   }}
                   disabledfield={false}
                 />
@@ -635,36 +654,29 @@ export function AccountForm() {
           )}
         />
 
-{
-        condition ? (
-          <Button onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
+        {
+          condition ? (
+            <Button type="submit" onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
 
-            Cookies.set('PacienteName', pacienteForm)
-            const pacientId = String(pacientIdForm) || "";
-            Cookies.set('PacienteID', pacientId)
-            if (MedicoIDForm !== undefined) {
-              Cookies.set('MedicoNameID', MedicoIDForm)
-            }
-            if (MedicoIDForm) {
-              router.push(`/register/sample?PacienteName=${pacienteForm}?PacienteID=${pacientIdForm}?MedicoNameID=${MedicoIDForm}?TutoreName=${nameTutorfind}`);
+              if (MedicoIDForm) {
+                router.push(`/register/sample?PacienteName=${pacienteForm}`);
 
-            } else {
-              setIsVisible(true);
-            }
-          }}
-            className="mt-4" >
-            Proximo
-          </Button >
-        ) : (
-          <Button type="submit">Salvar</Button>
-        )
-      }
+              } else {
+                setIsVisible(true);
+              }
+            }}>
+              Proximo
+            </Button >
+          ) : (
+            <Button type="submit">Salvar</Button>
+          )
+        }
 
 
 
-        
+
       </form>
     </Form >
 
