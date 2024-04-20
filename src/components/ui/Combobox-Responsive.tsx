@@ -115,6 +115,7 @@ export function ComboBoxResponsive({
             if (texArea === 'Tutor') {
                 const Tutores = await response.json();
 
+
                 // Transforma os dados para o formato desejado
                 const formattedPosts = Tutores.map((post: {
                     nameTutor: any; idTutor: any
@@ -127,6 +128,8 @@ export function ComboBoxResponsive({
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
                 setSelectedStatus(foundTutor)
                 Cookies.set(`${texArea}`, foundTutor.label || "")
+
+                console.log(foundTutor)
 
 
 
