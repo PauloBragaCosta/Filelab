@@ -174,14 +174,20 @@ export function PrinterForm() {
 
 
   async function print() {
-    await fetch(`http://127.0.0.1:5000`, {
-      method: 'POST',
-      body: JSON.stringify(base64Image),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-  }
+    try {
+      await fetch(`http://127.0.0.1:5000/`, {
+        method: 'POST',
+        body: JSON.stringify(base64Image),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+    } catch (error) {
+      console.error('Erro ao fazer a requisição:', error);
+    }
+}
+
+  
 
 
   return (
