@@ -581,30 +581,7 @@ export function AccountForm() {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Selecione o tutor</FormLabel>
-              <div className="flex">
-                <ComboBoxResponsive
-                  statuses={null}
-                  texArea="Tutor"
-                  IDFather={tutorIDForm}
-                  Formfather={null}
-                  onStatusChange={(status) => {
-                    field.onChange(status ? status.value : '');
-                    setNameTutorfind(status?.label);
-                    
-                  
-                  }}
-                  disabledfield={disabledfield}
-                />
-                <AddTutor
-                  tag="tutor"
-                  disabledfield={disabledfield}
-                  onStatusChange={(status) => {
-                    setTutorIDForm(status);
-
-
-                  }}
-                />
-              </div>
+              
               <FormDescription>
                 Selecione o nome do tutor.
               </FormDescription>

@@ -124,12 +124,17 @@ export function ComboBoxResponsive({
                     value: post.idTutor,
                 }));
 
+                console.log(formattedPosts)
+
 
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
                 setSelectedStatus(foundTutor)
-                Cookies.set(`${texArea}`, foundTutor.label || "")
+                if(texArea === "Tutor" && foundTutor && foundTutor.label) {
+                    Cookies.set(`${texArea}`, foundTutor.label)
+                    console.log(foundTutor)
+                }
 
-                console.log(foundTutor)
+                
 
 
 
@@ -149,10 +154,12 @@ export function ComboBoxResponsive({
                     label: post.label,
                     value: post.value,
                 }));
+                console.log(formattedPosts)
+
 
                 const foundTutor = formattedPosts.find((r: { value: any }) => r.value === IDFather);
                 setSelectedStatus(foundTutor)
-                if(texArea === "especie") {
+                if (texArea === "especie" && foundTutor && foundTutor.label) {
                     Cookies.set(`${texArea}`, foundTutor.label)
                 }
 

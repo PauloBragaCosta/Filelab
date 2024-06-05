@@ -90,7 +90,7 @@ model Image {
 }
 
 model OriginExam {
-  idExame           Int       @id @default(autoincrement())
+  idExame           Int          @id @default(autoincrement())
   urgent            Boolean
   storageValue      String? // Tipo de amostra enviada (tubo, pote, lâmina, outros)
   storageQuantity   String? // Quantidade de frascos
@@ -100,9 +100,21 @@ model OriginExam {
   exameTipo         String? // Tipo de exame (anatomia patológica, citopatologia, análise líquidos, análise hematológica, análise bioquímica)
   IdPaciente        Int?
   medicoId          String?
-  Paciente          Paciente? @relation(fields: [IdPaciente], references: [PacientId])
-  Medico            Medico?   @relation(fields: [medicoId], references: [idMedico])
-  Storage           Storage?  @relation(fields: [storageValue], references: [value])
-  ExamType          ExamType? @relation(fields: [exameTipo], references: [value])
+  Paciente          Paciente?    @relation(fields: [IdPaciente], references: [PacientId])
+  Medico            Medico?      @relation(fields: [medicoId], references: [idMedico])
+  Storage           Storage?     @relation(fields: [storageValue], references: [value])
+  ExamType          ExamType?    @relation(fields: [exameTipo], references: [value])
   Images            Image[] // Relation to multiple Image models
+  ExamResult        ExamResult[] // Relation to multiple BiochemicalExam models
 }
+
+model ExamResult {
+  id     Int        @id @default(autoincrement())
+  examId Int // ID do exame associado
+  result Json // Resultado do exame
+  Exam   OriginExam @relation(fields: [examId], references: [idExame])
+}
+
+// para poder fazer a atualização do banco de dados
+// npx prisma migrate dev --name nome_da_migracao
+
