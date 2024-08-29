@@ -24,7 +24,6 @@ export default function Home() {
   const [selectedTab, setSelectedTab] = useState<string>("overview");
   const tabsTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-  console.log(items)
 
   useEffect(() => {
     fetchItems();

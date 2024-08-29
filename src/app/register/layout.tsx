@@ -1,15 +1,13 @@
 "use client"
-import React, { useCallback, useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import {
-  FileTextIcon,
   Check,
   Trash,
   Loader2,
   Plus,
   AlertCircle,
-
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -40,9 +38,9 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Aside from "@/components/compopages/aside";
-import Header from "@/components/compopages/header";
-import { LockClosedIcon, LockOpen1Icon, LockOpen2Icon, Pencil1Icon, Pencil2Icon } from '@radix-ui/react-icons';
-import { Pencil } from 'lucide-react';
+import { LockClosedIcon, LockOpen2Icon } from '@radix-ui/react-icons';
+import { useItems } from '@/hooks/useItems';
+import { toast, Toaster } from "sonner";
 
 interface Item {
   itemCode: string;
@@ -54,7 +52,12 @@ interface Item {
 }
 
 export default function Home() {
-  const [items, setItems] = useState<Item[]>([]);
+  const { items, fetchItems } = useItems();
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const [itemsList, setItemsList] = useState<Item[]>([]);
   const [existingItems, setExistingItems] = useState<Item[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonVariant, setButtonVariant] = useState<"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success">("default");
@@ -90,16 +93,23 @@ export default function Home() {
   });
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    // Verifica se o item já existe na lista
-    const itemExists = items.some(item => item.itemCode === data.itemCode);
-
-    if (itemExists) {
-      // Se o item já existir, atualiza o botão "Adicionar" para a variante "destructive"
+    // Verifica se o itemCode já existe em items
+    const itemExistsInItems = items.some(item => item.itemCode === data.itemCode);
+    
+    // Verifica se o itemCode já existe em itemsList
+    const itemExistsInItemsList = itemsList.some(item => item.itemCode === data.itemCode);
+  
+    if (itemExistsInItems || itemExistsInItemsList) {
       setbuttonAddVariant("destructive");
-      console.log("Item com este código já existe.");
-
+      
+      if (itemExistsInItems) {
+        toast.error("Item com este código já existe em SERVIDOR VERCEL.");
+      } 
+      if (itemExistsInItemsList) {
+        toast.error("Item com este código já existe em LISTA.");
+      }
+      
     } else {
-      // Se o item não existir, adiciona-o à lista
       const newItem = {
         itemCode: data.itemCode,
         itemType: data.itemType,
@@ -108,19 +118,16 @@ export default function Home() {
         examType: data.examType,
         status: "arquivado",
       };
-
-      setItems((prevItems) => [...prevItems, newItem]);
+  
+      setItemsList((prevItems) => [...prevItems, newItem]);
       setItemTypeDefaut(data.itemType);
       setExamTypeDefaut(data.examType);
       setDisabledForm(true);
-
-      // Reseta o estado do botão para "default"
       setbuttonAddVariant("default");
       setDisabledButton(false);
-      console.log("Form data submitted:", data);
+      toast.success("Item adicionado com sucesso!");
     }
   };
-
 
   const handleSaveItems = async () => {
     try {
@@ -128,7 +135,7 @@ export default function Home() {
       setButtonVariant("default");
       setDisabledButton(true);
 
-      const itemsToSave = items.map(({ itemCode, itemType, boxNumber, spaceNumber, examType, status }) => ({
+      const itemsToSave = itemsList.map(({ itemCode, itemType, boxNumber, spaceNumber, examType, status }) => ({
         itemCode,
         itemType,
         boxNumber,
@@ -147,26 +154,27 @@ export default function Home() {
 
       if (response.ok) {
         const result = await response.json();
-        const { count } = result;
-
         setButtonStatus("success");
         setButtonVariant("success");
         setDisabledButton(false);
+        toast.success("Itens salvos com sucesso!");
       } else {
         const result = await response.json();
         setButtonVariant("destructive");
         setButtonStatus("Error");
         setDisabledButton(false);
         setExistingItems(result.existingItems || []);
+        toast.error("Erro ao salvar itens. Por favor, tente novamente.");
       }
     } catch (error) {
       console.error('Failed to save items', error);
+      toast.error("Erro ao salvar itens. Por favor, tente novamente.");
     }
   };
 
   const handleDeleteItem = (itemCode: string) => {
-    const updatedItems = items.filter(item => item.itemCode !== itemCode);
-    setItems(updatedItems);
+    const updatedItems = itemsList.filter(item => item.itemCode !== itemCode);
+    setItemsList(updatedItems);
     const hasExistingItems = updatedItems.some(item =>
       existingItems.some(existingItem => existingItem.itemCode === item.itemCode)
     );
@@ -176,17 +184,12 @@ export default function Home() {
       setButtonVariant("success");
       setDisabledButton(false);
     }
+    toast.success("Item removido com sucesso!");
   };
-
-  const handleKeyDown = useCallback((event: any) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      form.handleSubmit(onSubmit)();
-    }
-  }, [form]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <Toaster />
       {errorMessage && <div className="error-message">{errorMessage}</div>}
       <Aside />
 
@@ -368,7 +371,7 @@ export default function Home() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.slice().reverse().map((item) => {
+                  {itemsList.slice().reverse().map((item) => {
                     const isExistingItem = existingItems.some(existingItem => existingItem.itemCode === item.itemCode);
                     return (
                       <TableRow key={item.itemCode}>
