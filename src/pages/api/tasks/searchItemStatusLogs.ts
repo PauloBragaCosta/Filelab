@@ -9,7 +9,7 @@ type ItemStatusLog = {
   UserCreated: string;
   observation: string;
   status: string;
-  createdAt: string; // Aqui, createdAt é do tipo string
+  createdAt: string; // `createdAt` agora é uma string no tipo
 };
 
 type Data = ItemStatusLog[] | { error: string };
@@ -18,7 +18,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { itemCode } = req.query;
+  const { itemCode } = req.body;
 
   if (!itemCode || typeof itemCode !== 'string') {
     return res.status(400).json({ error: 'Item code is required' });
@@ -29,9 +29,8 @@ export default async function handler(
       where: { itemCode },
     });
 
-    // Mapear todos os campos corretamente e converter `createdAt` para string
-    const responseLogs: ItemStatusLog[] = itemStatusLogs.map((log: { id: any; itemCode: any; UserCreated: any; observation: any; status: any; createdAt: { toISOString: () => any; }; }) => ({
-      id: log.id,
+    const responseLogs: ItemStatusLog[] = itemStatusLogs.map((log) => ({
+      id: log.id.toString(), // Converte `id` para string
       itemCode: log.itemCode,
       UserCreated: log.UserCreated,
       observation: log.observation,
@@ -41,6 +40,7 @@ export default async function handler(
 
     res.status(200).json(responseLogs);
   } catch (error) {
+    console.error('Error fetching item status logs:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }

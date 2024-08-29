@@ -41,6 +41,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Aside from "@/components/compopages/aside";
 import Header from "@/components/compopages/header";
+import { LockClosedIcon, LockOpen1Icon, LockOpen2Icon, Pencil1Icon, Pencil2Icon } from '@radix-ui/react-icons';
+import { Pencil } from 'lucide-react';
 
 interface Item {
   itemCode: string;
@@ -56,6 +58,7 @@ export default function Home() {
   const [existingItems, setExistingItems] = useState<Item[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonVariant, setButtonVariant] = useState<"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success">("default");
+  const [buttonAddVariant, setbuttonAddVariant] = useState<"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success">("default");
   const [buttonStatus, setButtonStatus] = useState("");
   const [disabledButton, setDisabledButton] = useState(true);
 
@@ -87,17 +90,16 @@ export default function Home() {
   });
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    setItemTypeDefaut(data.itemType)
-    setExamTypeDefaut(data.examType)
-    setDisabledForm(true)
+    // Verifica se o item já existe na lista
+    const itemExists = items.some(item => item.itemCode === data.itemCode);
 
-    setButtonStatus("success");
-    setButtonVariant("success");
-    setDisabledButton(false);
-    console.log("Form data submitted:", data);
-    if (items.some(item => item.itemCode === data.itemCode)) {
+    if (itemExists) {
+      // Se o item já existir, atualiza o botão "Adicionar" para a variante "destructive"
+      setbuttonAddVariant("destructive");
       console.log("Item com este código já existe.");
+
     } else {
+      // Se o item não existir, adiciona-o à lista
       const newItem = {
         itemCode: data.itemCode,
         itemType: data.itemType,
@@ -108,8 +110,17 @@ export default function Home() {
       };
 
       setItems((prevItems) => [...prevItems, newItem]);
+      setItemTypeDefaut(data.itemType);
+      setExamTypeDefaut(data.examType);
+      setDisabledForm(true);
+
+      // Reseta o estado do botão para "default"
+      setbuttonAddVariant("default");
+      setDisabledButton(false);
+      console.log("Form data submitted:", data);
     }
   };
+
 
   const handleSaveItems = async () => {
     try {
@@ -213,11 +224,29 @@ export default function Home() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Item Details</CardTitle>
-                <FileTextIcon className="h-4 w-4 text-muted-foreground" />
+                <Button
+                  onClick={() => setDisabledForm(false)}
+                  variant="outline"
+                  className="flex items-center"
+                >
+                  {disabledForm === false ? (
+                <>
+                  <LockOpen2Icon className="h-4 w-4 text-muted-foreground" />
+                  
+                </>
+              ) : (
+                <>
+                  <LockClosedIcon className="h-4 w-4 text-muted-foreground" />
+                  
+                </>
+              )}
+    
+                </Button>
+
               </CardHeader>
               <CardContent>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} onKeyDown={handleKeyDown} className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
                     <FormField
                       control={form.control}
                       name="itemCode"
@@ -225,7 +254,12 @@ export default function Home() {
                         <FormItem>
                           <FormLabel>Código do item</FormLabel>
                           <FormControl>
-                            <Input placeholder="0000000" {...field} />
+                            <Input placeholder="0000000" {...field}
+                              onChange={(e) => {
+                                field.onChange(e); // Manter a mudança de estado do campo
+                                setbuttonAddVariant("default"); // Mudar o status do botão
+                              }}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -308,7 +342,10 @@ export default function Home() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="flex items-center"><Check /> Adicionar</Button>
+                    <Button type="submit" variant={buttonAddVariant} className="flex items-center" accessKey="Enter">
+                      <Check /> Adicionar
+                    </Button>
+
                   </form>
                 </Form>
               </CardContent>
@@ -331,7 +368,7 @@ export default function Home() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((item) => {
+                  {items.slice().reverse().map((item) => {
                     const isExistingItem = existingItems.some(existingItem => existingItem.itemCode === item.itemCode);
                     return (
                       <TableRow key={item.itemCode}>
@@ -349,7 +386,7 @@ export default function Home() {
                             variant="secondary"
                             onClick={() => handleDeleteItem(item.itemCode)}
                           >
-                            <Trash className="h-4 w-4 text-black" />
+                            <Trash className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         </TableCell>
                       </TableRow>
