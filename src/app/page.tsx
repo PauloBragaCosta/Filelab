@@ -25,15 +25,13 @@ export default function LandingPage() {
           <Button className="text-sm font-medium" variant="ghost">
             Contato
           </Button>
+          <Link href="/home">
           {status === "authenticated" ? (
-            <Link href="/home">
-              <Button>Home</Button>
-            </Link>
+            <Button>Home</Button>
           ) : (
-            <Link href="/signin">
-              <Button>Signin</Button>
-            </Link>
+            <Button>Signin</Button>
           )}
+          </Link>
         </nav>
       </header>
       <main className="flex-1">

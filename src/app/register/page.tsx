@@ -44,6 +44,7 @@ import { toast, Toaster } from "sonner";
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import SessionMenu from '@/components/compopages/SessionMenu';
 
 interface Item {
   itemCode: string;
@@ -231,214 +232,213 @@ export default function Home() {
       <Toaster />
       {errorMessage && <div className="error-message">{errorMessage}</div>}
 
+      <div className="flex flex-col p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Link href="/">
+                <Package2 className="h-6 w-6" />
+              </Link>
+              <h1 className="text-2xl font-bold tracking-tight">Cadastro</h1>
+            </div>
+            <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
+              <Button onClick={handleSaveItems} variant={buttonVariant} disabled={disabledButton}>
+                {buttonStatus === "success" ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Salvar
+                  </>
+                ) : buttonStatus === "Loading" ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Carregando
+                  </>
+                ) : buttonStatus === "Error" ? (
+                  <>
+                    <AlertCircle className="mr-2 h-4 w-4" />
+                    Enviar novamente
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Salvar
+                  </>
+                )}
+              </Button>
 
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-
-        <div className="flex-1 space-y-4 p-4 pt-0 md:p-6 md:pt-0">
-          <div className="space-between flex flex-wrap items-center gap-2">
-            <Link rel="stylesheet" href="/">
-              <Package2 />
-            </Link>
-            <h1 className="text-2xl font-bold tracking-tight">Cadastro</h1>
-            <Button className="ml-auto" onClick={handleSaveItems} variant={buttonVariant} disabled={disabledButton}>
-              {buttonStatus === "success" ? (
-                <>
-                  <Check className="mr-2 h-4 w-4" />
-                  salvar
-                </>
-              ) : buttonStatus === "Loading" ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  carregando
-                </>
-              ) : buttonStatus === "Error" ? (
-                <>
-                  <AlertCircle className="mr-2 h-4 w-4" />
-                  enviar novamente
-                </>
-              ) : (
-                <>
-                  <Plus className="mr-2 h-4 w-4" />
-                  salvarr
-                </>
-              )}
-            </Button>
-
+              <SessionMenu />
+            </div>
           </div>
-          <div>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Item Details</CardTitle>
-                <Button
-                  onClick={() => setDisabledForm(false)}
-                  variant="outline"
-                  className="flex items-center"
-                >
-                  {disabledForm === false ? (
-                    <>
-                      <LockOpen2Icon className="h-4 w-4 text-muted-foreground" />
 
-                    </>
-                  ) : (
-                    <>
-                      <LockClosedIcon className="h-4 w-4 text-muted-foreground" />
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Item Details</CardTitle>
+              <Button
+                onClick={() => setDisabledForm(!disabledForm)}
+                variant="outline"
+                size="icon"
+              >
+                {disabledForm ? (
+                  <LockClosedIcon className="h-4 w-4" />
+                ) : (
+                  <LockOpen2Icon className="h-4 w-4" />
+                )}
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 items-end">
+                  <FormField
+                    control={form.control}
+                    name="itemCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Código do item</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0000000" {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setbuttonAddVariant("default");
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    </>
-                  )}
-
-                </Button>
-
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
-                    <FormField
-                      control={form.control}
-                      name="itemCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Código do item</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="itemType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo</FormLabel>
+                        <Select disabled={disabledForm} onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <Input placeholder="0000000" {...field}
-                              onChange={(e) => {
-                                field.onChange(e); // Manter a mudança de estado do campo
-                                setbuttonAddVariant("default"); // Mudar o status do botão
-                              }}
-                            />
+                            <SelectTrigger>
+                              <SelectValue placeholder="Bloco ou lâmina" />
+                            </SelectTrigger>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Tipo</SelectLabel>
+                              <SelectItem value="bloco">Bloco</SelectItem>
+                              <SelectItem value="lamina">Lâmina</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="itemType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tipo</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="examType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Exame</FormLabel>
+                        <Select disabled={disabledForm} onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <Select disabled={disabledForm} onValueChange={field.onChange} defaultValue={field.value}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Bloco ou lâmina" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel>Tipo</SelectLabel>
-                                  <SelectItem value="bloco">Bloco</SelectItem>
-                                  <SelectItem value="lamina">Lâmina</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Exames</SelectLabel>
+                              <SelectItem value="patologia">Anatomia patológica</SelectItem>
+                              <SelectItem value="hematologia">Hematologia</SelectItem>
+                              <SelectItem value="citologia">Citologia</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="examType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tipo de Exame</FormLabel>
-                          <FormControl>
-                            <Select disabled={disabledForm} onValueChange={field.onChange} defaultValue={field.value}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectGroup>
-                                  <SelectLabel>Exames</SelectLabel>
-                                  <SelectItem value="patologia">Anatomia patológica</SelectItem>
-                                  <SelectItem value="hematologia">Hematologia</SelectItem>
-                                  <SelectItem value="citologia">Citologia</SelectItem>
-                                </SelectGroup>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="boxNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número da caixa</FormLabel>
-                          <FormControl>
-                            <Input placeholder="00" type="number" {...field} disabled={disabledForm} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="spaceNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Número da coluna</FormLabel>
-                          <FormControl>
-                            <Input placeholder="00" {...field} disabled={disabledForm} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" variant={buttonAddVariant} className="flex items-center" accessKey="Enter">
-                      <Check /> Adicionar
-                    </Button>
+                  <FormField
+                    control={form.control}
+                    name="boxNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número da caixa</FormLabel>
+                        <FormControl>
+                          <Input placeholder="00" type="number" {...field} disabled={disabledForm} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </div>
+                  <FormField
+                    control={form.control}
+                    name="spaceNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Número da coluna</FormLabel>
+                        <FormControl>
+                          <Input placeholder="00" {...field} disabled={disabledForm} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" variant={buttonAddVariant} className="w-full">
+                    <Check className="mr-2 h-4 w-4" /> Adicionar
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Cadastrados recentemente</CardTitle>
             </CardHeader>
             <CardContent className="px-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Código do Item</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>nº Caixa</TableHead>
-                    <TableHead>nº Coluna</TableHead>
-                    <TableHead>Exame</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {itemsList.slice().reverse().map((item) => {
-                    const isExistingItem = existingItems.some(existingItem => existingItem.itemCode === item.itemCode);
-                    return (
-                      <TableRow key={item.itemCode}>
-                        <TableCell className="font-medium">
-                          {item.itemCode}
-                          {isExistingItem && <Badge variant="destructive">Já Cadastrado</Badge>}
-                        </TableCell>
-                        <TableCell>{item.itemType}</TableCell>
-                        <TableCell>{item.boxNumber}</TableCell>
-                        <TableCell>{item.spaceNumber}</TableCell>
-                        <TableCell>{item.examType}</TableCell>
-                        <TableCell>
-                          <Button
-                            className="p-0 h-5 w-5 bg-transparent"
-                            variant="secondary"
-                            onClick={() => handleDeleteItem(item.itemCode)}
-                          >
-                            <Trash className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[150px]">Código do Item</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>nº Caixa</TableHead>
+                      <TableHead>nº Coluna</TableHead>
+                      <TableHead>Exame</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {itemsList.slice().reverse().map((item) => {
+                      const isExistingItem = existingItems.some(existingItem => existingItem.itemCode === item.itemCode);
+                      return (
+                        <TableRow key={item.itemCode}>
+                          <TableCell className="font-medium">
+                            {item.itemCode}
+                            {isExistingItem && <Badge variant="destructive" className="ml-2">Já Cadastrado</Badge>}
+                          </TableCell>
+                          <TableCell>{item.itemType}</TableCell>
+                          <TableCell>{item.boxNumber}</TableCell>
+                          <TableCell>{item.spaceNumber}</TableCell>
+                          <TableCell>{item.examType}</TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              onClick={() => handleDeleteItem(item.itemCode)}
+                              variant="ghost"
+                              size="icon"
+                            >
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>
