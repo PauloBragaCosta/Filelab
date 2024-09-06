@@ -40,10 +40,11 @@ export default function SessionMenu() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem><Link href="/home">Incio</Link></DropdownMenuItem>
+              <DropdownMenuItem><Link href="/settings">Configuração</Link></DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut()}>Sair</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
