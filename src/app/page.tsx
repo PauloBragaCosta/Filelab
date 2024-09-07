@@ -1,36 +1,45 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Package2 } from "lucide-react"
+import { Menu, Package2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
+import { useState } from "react"
 
 export default function LandingPage() {
   const { data: session, status } = useSession()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
-      <header className="px-4 lg:px-6 h-14 flex items-center border-b border-gray-200">
+      <header className="px-4 lg:px-6 h-14 flex items-center justify-between border-b border-gray-200">
         <Link className="flex items-center justify-center" href="/">
           <span className="sr-only">File-Lab</span>
-          <Package2/>
+          <Package2 className="h-6 w-6" />
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Button className="text-sm font-medium" variant="ghost">
+        <button
+          className="lg:hidden"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <nav className={`${isMenuOpen ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row absolute lg:relative top-14 left-0 right-0 bg-white lg:top-0 lg:bg-transparent z-50 border-b lg:border-b-0 border-gray-200 lg:ml-auto`}>
+          <Button className="text-xs lg:text-sm font-medium w-full lg:w-auto" variant="ghost">
             Sobre
           </Button>
-          <Button className="text-sm font-medium" variant="ghost">
+          <Button className="text-xs lg:text-sm font-medium w-full lg:w-auto" variant="ghost">
             Funcionalidades
           </Button>
-          <Button className="text-sm font-medium" variant="ghost">
+          <Button className="text-xs lg:text-sm font-medium w-full lg:w-auto" variant="ghost">
             Contato
           </Button>
-          <Link href="/home">
-          {status === "authenticated" ? (
-            <Button>Home</Button>
-          ) : (
-            <Button>Signin</Button>
-          )}
+          <Link href="/home" className="w-full lg:w-auto">
+            {status === "authenticated" ? (
+              <Button variant="ghost" className="w-full lg:w-auto text-xs lg:text-sm">Dashboard</Button>
+            ) : (
+              <Button className="w-full lg:w-auto text-xs lg:text-sm">Signin</Button>
+            )}
           </Link>
         </nav>
       </header>

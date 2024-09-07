@@ -1,68 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Item } from '@/types/item';
 
-// Defina a interface para os itens
-interface BoxSpaceItem {
-  itemCode: string;
-  examType: string;
-  status: string;
+// Defina a interface para as props do componente
+interface BoxSpaceItemsProps {
+  boxNumber: string;
+  spaceNumber: string;
+  itemType: string;
+  items: Item[]; // A lista de itens é passada como prop
 }
 
-export function BoxSpaceItems({ boxNumber, spaceNumber, itemType }: { boxNumber: string; spaceNumber: string; itemType: string }) {
-  const [boxSpaceItems, setBoxSpaceItems] = useState<BoxSpaceItem[]>([]);
-
-  useEffect(() => {
-    async function fetchBoxSpaceItems() {
-      try {
-        const response = await fetch('/api/tasks/searchByBoxSpaceType', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ boxNumber, spaceNumber, itemType }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const items: BoxSpaceItem[] = await response.json();
-        setBoxSpaceItems(items);
-      } catch (error) {
-        console.error('Error fetching items:', error);
-        setBoxSpaceItems([]);
-      }
-    }
-
-    fetchBoxSpaceItems();
-  }, [boxNumber, spaceNumber, itemType]);
+export function BoxSpaceItems({ boxNumber, spaceNumber, itemType, items }: BoxSpaceItemsProps) {
+  // Filtra os itens com base nos critérios de boxNumber, spaceNumber e itemType
+  const filteredItems = items.filter(
+    (item) => 
+      item.boxNumber === boxNumber && 
+      item.spaceNumber === spaceNumber 
+  );
 
   return (
-    <Card className="flex-1 space-y-4">
+    <Card className="flex-1">
       <CardHeader>
         <CardTitle>Itens da mesma coluna</CardTitle>
-        <CardDescription>contem {boxSpaceItems.length} registros</CardDescription>
+        <CardDescription>Contém {filteredItems.length} registros</CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Exame</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {boxSpaceItems.map((item) => (
-              <TableRow key={item.itemCode}>
-                <TableCell>{item.itemCode}</TableCell>
-                <TableCell>{item.examType}</TableCell>
-                <TableCell>{item.status}</TableCell>
+        <div className="h-[300px] sm:h-[300px] md:h-[350px] lg:h-[400px] overflow-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background z-10">
+              <TableRow>
+                <TableHead>Código</TableHead>
+                <TableHead>Exame</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody className="overflow-y-auto">
+              {filteredItems.map((item) => (
+                <TableRow key={item.itemCode}>
+                  <TableCell>{item.itemCode}</TableCell>
+                  <TableCell>{item.examType}</TableCell>
+                  <TableCell>{item.status}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

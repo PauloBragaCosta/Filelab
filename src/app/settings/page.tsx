@@ -121,7 +121,7 @@ export default function SettingsPage() {
       <header className="flex flex-wrap items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2">
           <Package2 className="h-6 w-6" />
-          <h1 className="text-lg font-semibold md:text-xl">Configurações</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
         </Link>
 
         <SessionMenu />

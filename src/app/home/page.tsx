@@ -12,9 +12,9 @@ import { useItemStatusLogs } from '@/hooks/useItemStatusLogs';
 import { Item } from '@/types/item';
 import { useSession } from "next-auth/react";
 import SessionMenu from '../../components/compopages/SessionMenu';
-import { BoxSpaceItems } from '@/components/compopages/BoxSpaceItems';
 import { ItemDetails } from '@/components/compopages/ItemDetails';
 import { ItemStatusLogsTable } from '@/components/compopages/ItemStatusLogsTable';
+import { BoxSpaceItems } from '@/components/compopages/BoxSpaceItems';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -110,9 +110,10 @@ export default function Home() {
                   <ItemDetails item={selectedItem} />
                   <div className="flex flex-col gap-4 md:flex-row">
                     <BoxSpaceItems
+                      items={items}
                       boxNumber={selectedItem.boxNumber}
                       spaceNumber={selectedItem.spaceNumber}
-                      itemType={selectedItem.itemType}
+                      itemType={selectedItem.itemCode}
                     />
                     <ItemStatusLogsTable logs={itemStatusLogs} />
                   </div>
