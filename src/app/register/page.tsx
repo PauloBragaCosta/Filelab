@@ -125,13 +125,6 @@ export default function Home() {
   }
 
 
-
-
-
-
-
-
-
   const onSubmit: SubmitHandler<FormData> = (data) => {
     // Verifica se o itemCode já existe em items
     const itemExistsInItems = items.some(item => item.itemCode === data.itemCode);

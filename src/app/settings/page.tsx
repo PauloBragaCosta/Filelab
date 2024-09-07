@@ -32,6 +32,9 @@ export default function SettingsPage() {
   const [autoTheme, setAutoTheme] = useState(false)
   const router = useRouter();
   const { data: session, status } = useSession();
+  const tudo = useSession();
+  console.log(tudo)
+
   const [file, setFile] = useState<File | null>(null);
 
 
@@ -65,17 +68,25 @@ export default function SettingsPage() {
     const response = await fetch('/api/backup/download');
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
-
+  
+    // Obtém a data e hora atuais
+    const now = new Date();
+    const formattedDate = now.toISOString().slice(0, 19).replace(/:/g, '-'); // Formata a data e hora como "2024-09-06T15-18-37"
+  
+    // Nomeia o arquivo com a data e hora
+    const filename = `backup-${formattedDate}.json`;
+  
     // Cria um link temporário para fazer o download do arquivo
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'backup.json'); // Nome do arquivo de backup
+    link.setAttribute('download', filename); // Nome do arquivo com a data e hora
     document.body.appendChild(link);
     link.click();
-
+  
     // Remove o link temporário após o download
     link.parentNode?.removeChild(link);
   };
+  
 
 
 
