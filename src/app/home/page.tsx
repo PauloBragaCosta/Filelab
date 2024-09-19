@@ -1,82 +1,39 @@
-"use client";
+"use client"
 
-import React, { useState, useRef, useEffect, lazy, Suspense } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
-import { Package2, PlusCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation';
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Link from 'next/link';
+import { Package2, PlusCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CommandDialogSearch } from '@/components/compopages/CommandDialogSearch';
 import { useItems } from '@/hooks/useItems';
 import { useItemStatusLogs } from '@/hooks/useItemStatusLogs';
-import { Item, User } from '@/types/item';
-import SessionMenu from '../../components/compopages/SessionMenu';
+import { Item } from '@/types/item';
+import SessionMenu from '@/components/compopages/SessionMenu';
+import dynamic from 'next/dynamic';
+import useFirebaseAuth from '@/hooks/useFirebaseAuth';
 
-import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
-import { initializeApp } from 'firebase/app';
+// Importando componentes dinamicamente
+const VisaoGeral = dynamic(() => import('@/components/compopages/visaoGeral'), { ssr: false });
+const ItemDetails = dynamic(() => import('@/components/compopages/ItemDetails'), { ssr: false });
+const ItemStatusLogsTable = dynamic(() => import('@/components/compopages/ItemStatusLogsTable'), { ssr: false });
+const BoxSpaceItems = dynamic(() => import('@/components/compopages/BoxSpaceItems'), { ssr: false });
 
-const VisaoGeral = lazy(() => import('@/components/compopages/visaoGeral'));
-const ItemDetails = lazy(() => import('@/components/compopages/ItemDetails'));
-const ItemStatusLogsTable = lazy(() => import('@/components/compopages/ItemStatusLogsTable'));
-const BoxSpaceItems = lazy(() => import('@/components/compopages/BoxSpaceItems'));
-
-
-
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBC_T___UQrgPjRuA9Bv5pCi-Es9MHMDSk",
-  authDomain: "file-lab.firebaseapp.com",
-  projectId: "file-lab",
-  storageBucket: "file-lab.appspot.com",
-  messagingSenderId: "936477114424",
-  appId: "1:936477114424:web:c3cb3ecdc342fde09226cd",
-  measurementId: "G-HELPVWV0KF"
-};
-
-export default function Home() {
-  const router = useRouter();
+const Home = () => {
+  const { user, loading, auth } = useFirebaseAuth();
   const { items, fetchItems } = useItems();
   const { itemStatusLogs, fetchItemStatusLogs } = useItemStatusLogs();
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string>("overview");
-  const tabsTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-  const itemsFetchedRef = useRef(false);
+  const [selectedItem, setSelectedItem] = React.useState<Item | null>(null);
+  const [selectedTab, setSelectedTab] = React.useState<string>('overview');
 
-
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        console.log(firebaseUser)
-        setUser({
-          name: firebaseUser.displayName || "Usuário",
-          photo: firebaseUser.photoURL || "",
-        });
-        setLoading(false);
-      } else {
-        setUser(null);
-        setLoading(false);
-        router.push('/signin');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth, router]);
-
-  useEffect(() => {
-    if (!itemsFetchedRef.current && user) {
+  React.useEffect(() => {
+    if (user && !items.length) {
       fetchItems();
-      itemsFetchedRef.current = true;
     }
-  }, [fetchItems, user]);
+  }, [user, items, fetchItems]);
 
   const handleSelectItem = (itemCode: string) => {
-    const item = items.find((item: Item) => item.itemCode === itemCode);
+    const item = items.find((item) => item.itemCode === itemCode);
     if (item) {
       setSelectedItem(item);
       setSelectedTab(item.itemType);
@@ -89,10 +46,8 @@ export default function Home() {
   }
 
   if (!user) {
-    return null; // This will prevent any content from rendering while redirecting
+    return null; // Isso impede que qualquer conteúdo seja renderizado enquanto redireciona
   }
-
-
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -118,35 +73,16 @@ export default function Home() {
         <div className="flex-1 space-y-4">
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
             <TabsList className="flex flex-wrap justify-start gap-2">
-              <TabsTrigger
-                value="overview"
-                ref={(el) => { tabsTriggerRefs.current["overview"] = el; }}
-                className="px-3 py-1.5 text-sm"
-              >
+              <TabsTrigger value="overview" className="px-3 py-1.5 text-sm">
                 Visão geral
               </TabsTrigger>
-              <TabsTrigger
-                value="bloco"
-                disabled={!selectedItem}
-                ref={(el) => { tabsTriggerRefs.current["bloco"] = el; }}
-                className="px-3 py-1.5 text-sm"
-              >
+              <TabsTrigger value="bloco" disabled={!selectedItem} className="px-3 py-1.5 text-sm">
                 Blocos
               </TabsTrigger>
-              <TabsTrigger
-                value="lamina"
-                disabled={!selectedItem}
-                ref={(el) => { tabsTriggerRefs.current["lamina"] = el; }}
-                className="px-3 py-1.5 text-sm"
-              >
+              <TabsTrigger value="lamina" disabled={!selectedItem} className="px-3 py-1.5 text-sm">
                 Lâminas
               </TabsTrigger>
-              <TabsTrigger
-                value="notifications"
-                disabled
-                ref={(el) => { tabsTriggerRefs.current["notifications"] = el; }}
-                className="px-3 py-1.5 text-sm"
-              >
+              <TabsTrigger value="notifications" disabled className="px-3 py-1.5 text-sm">
                 Expurgo
               </TabsTrigger>
             </TabsList>
@@ -180,6 +116,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
 
-
+export default Home;

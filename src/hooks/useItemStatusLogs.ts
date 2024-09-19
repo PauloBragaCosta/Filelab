@@ -1,4 +1,5 @@
 // hooks/useItemStatusLogs.ts
+"use client"
 import { useState } from 'react';
 
 export function useItemStatusLogs() {
