@@ -6,7 +6,6 @@ export interface Item {
     spaceNumber: string;
     examType: string;
     status: string;
-    createdAt: string;
     // Add any other properties that should be part of the Item interface
 };
 
