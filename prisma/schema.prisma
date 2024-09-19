@@ -35,8 +35,13 @@ model ItemStatusLog {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  email     String   @unique @db.VarChar(255) // Limitando o tamanho do email
+  password  String   @db.VarChar(255) // Tamanho máximo para senhas
   createdAt DateTime @default(now())
+  role      String   @default("user")
+  name      String?  @db.VarChar(255) // Campo opcional para o nome
 }
+
+
+

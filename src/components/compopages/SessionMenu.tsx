@@ -1,5 +1,6 @@
-'use client'
+'use client';
 
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,60 +9,64 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { useSession } from "next-auth/react"
-import { signOut } from "next-auth/react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { signOut as firebaseSignOut, User, Auth } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 
-export default function SessionMenu() {
-  const session = useSession()
-  console.log(session)
 
+interface SessionMenuProps {
+  userName: string;
+  userPhoto: string;
+  auth: Auth;
+}
+
+export default function SessionMenu({ userName, userPhoto, auth }: SessionMenuProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+
+
+ 
+
+  const handleSignOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+      router.push('/signin');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   return (
-    <>
-      {session.status === "authenticated" ? (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="overflow-hidden rounded-full"
-              >
-                <Avatar>
-                  <AvatarImage src="https://avatars.githubusercontent.com/u/48026280?v=4" />
-                  <AvatarFallback>PB</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem><Link href="/home">Incio</Link></DropdownMenuItem>
-              <DropdownMenuItem><Link href="/settings">Configuração</Link></DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut()}>Sair</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-
-        </>
-      ) : (
-        <>
-
-          <Link href="/signin" className="flex items-center">
-            <Button>
-              Sign In
-            </Button>
-          </Link>
-        </>
-      )
-      }
-    </>
-
-  )
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          className="overflow-hidden rounded-full"
+        >
+          <Avatar>
+            <AvatarImage src={userPhoto} alt="User Photo" />
+            <AvatarFallback>{userName[0]}</AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Link href="/home">Início</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href="/settings">Configuração</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>Suporte</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleSignOut}>Sair</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }

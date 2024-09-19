@@ -12,7 +12,7 @@ interface LogItem {
   createdAt: string; // Supondo que haja um campo createdAt
 }
 
-export function ItemStatusLogsTable({ logs }: { logs: LogItem[] }) {
+export default function ItemStatusLogsTable({ logs }: { logs: LogItem[] }) {
   return (
     <Card className="flex-[2] space-y-4">
       <CardHeader className="px-7">

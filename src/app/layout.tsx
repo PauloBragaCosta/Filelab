@@ -2,7 +2,6 @@
 import "@/styles/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 
-import { SessionProvider } from "next-auth/react";
 
 
 export default function RootLayout({
@@ -13,8 +12,7 @@ export default function RootLayout({
   // You can use fontSans here if needed
   return (
     <>
-      <SessionProvider>
-        <html lang="en" suppressHydrationWarning>
+        <html lang="pt-BR" suppressHydrationWarning>
           <head />
           <body>
             <ThemeProvider
@@ -27,7 +25,6 @@ export default function RootLayout({
             </ThemeProvider>
           </body>
         </html>
-      </SessionProvider>
     </>
   )
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 import { File } from "lucide-react"
 import {
@@ -147,30 +149,31 @@ function LoadingSkeleton() {
           <CardTitle>Cadastrados recentemente</CardTitle>
         </CardHeader>
         <CardContent className="px-0">
-          
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="sticky top-0 bg-background">ID do item</TableHead>
-                  <TableHead className="sticky top-0 bg-background">Exame</TableHead>
-                  <TableHead className="sticky top-0 bg-background">Tipo</TableHead>
-                  <TableHead className="sticky top-0 bg-background text-right">Status</TableHead>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="sticky top-0 bg-background">ID do item</TableHead>
+                <TableHead className="sticky top-0 bg-background">Exame</TableHead>
+                <TableHead className="sticky top-0 bg-background">Tipo</TableHead>
+                <TableHead className="sticky top-0 bg-background text-right">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody className="h-[270px] sm:h-[300px] md:h-[350px] lg:h-[400px] overflow-auto">
+              {[...Array(10)].map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
+                  <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
+                  <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
+                  <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-              <div className="h-[270px] sm:h-[300px] md:h-[350px] lg:h-[400px] overflow-auto">
-                {[...Array(10)].map((_, index) => (
-                  <TableRow key={index}>
-                    <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
-                    <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
-                    <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
-                    <TableCell><Skeleton className="h-3 w-[50px]" /></TableCell>
-                  </TableRow>
-                ))}
-                </div>
-              </TableBody>
-            </Table>
-          
+              ))}
+            </TableBody>
+
+
+          </Table>
+
         </CardContent>
       </Card>
     </div>

@@ -11,7 +11,7 @@ interface BoxSpaceItemsProps {
   items: Item[]; // A lista de itens é passada como prop
 }
 
-export function BoxSpaceItems({ boxNumber, spaceNumber, itemType, items }: BoxSpaceItemsProps) {
+export default function BoxSpaceItems({ boxNumber, spaceNumber, itemType, items }: BoxSpaceItemsProps) {
   // Filtra os itens com base nos critérios de boxNumber, spaceNumber e itemType
   const filteredItems = items.filter(
     (item) => 

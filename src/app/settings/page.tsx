@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -23,31 +23,57 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import SessionMenu from '@/components/compopages/SessionMenu'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { Input } from '@/components/ui/input'
+import { firebaseConfig, User } from '@/types/item'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { initializeApp } from 'firebase/app'
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [autoTheme, setAutoTheme] = useState(false)
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  const tudo = useSession();
-  console.log(tudo)
-
   const [file, setFile] = useState<File | null>(null);
 
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          name: firebaseUser.displayName || "Usuário",
+          photo: firebaseUser.photoURL || "",
+        });
+        setLoading(false);
+      } else {
+        setUser(null);
+        setLoading(false);
+        router.push('/signin');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth, router]);
 
   useEffect(() => {
     setMounted(true)
     setAutoTheme(theme === 'system')
   }, [theme])
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/signin");
-    }
-  }, [status, router]);
+  if (loading) {
+    return <p>Carregando...</p>;
+  }
+
+  if (!user) {
+    return null; // This will prevent any content from rendering while redirecting
+  }
+
+  if (!mounted) {
+    return null
+  }
 
   const handleThemeChange = (value: string) => {
     setTheme(value)
@@ -58,11 +84,6 @@ export default function SettingsPage() {
     setAutoTheme(checked)
     setTheme(checked ? 'system' : 'light')
   }
-
-  if (!mounted) {
-    return null
-  }
-
 
   const handleDownload = async () => {
     const response = await fetch('/api/backup/download');
@@ -86,9 +107,6 @@ export default function SettingsPage() {
     // Remove o link temporário após o download
     link.parentNode?.removeChild(link);
   };
-  
-
-
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -124,78 +142,89 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
         </Link>
 
-        <SessionMenu />
+        <SessionMenu userName={user.name} userPhoto={user.photo} auth={auth} />
       </header>
 
       <main className="flex-1 space-y-4 p-4 md:p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Configurações de Tema</CardTitle>
-            <CardDescription>Personalize a aparência do seu aplicativo</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="auto-theme">Tema automático</Label>
-              <Switch
-                id="auto-theme"
-                checked={autoTheme}
-                onCheckedChange={handleAutoThemeToggle}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="theme-select">Selecionar tema</Label>
-              <Select
-                value={theme}
-                onValueChange={handleThemeChange}
-                disabled={autoTheme}
-              >
-                <SelectTrigger id="theme-select">
-                  <SelectValue placeholder="Selecione um tema" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">
-                    <div className="flex items-center gap-2">
-                      <Sun className="h-4 w-4" />
-                      Claro
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="dark">
-                    <div className="flex items-center gap-2">
-                      <Moon className="h-4 w-4" />
-                      Escuro
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Download do Backup</CardTitle>
-            <CardDescription>area para fazer o Backup completo do banco de dados</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={handleDownload}>Download Backup</Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Upload do Backup</CardTitle>
-            <CardDescription>area para fazer o Upload completo do banco de dados</CardDescription>
-          </CardHeader>
-          <CardContent>
-
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="picture">Arquivo</Label>
-              <Input id="picture" type="file" onChange={handleFileChange} />
-            </div>
-            
-            <Button onClick={handleUpload}>Upload Backup</Button>
-          </CardContent>
-        </Card>
+      
+        <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
+          <nav className="grid gap-4 text-sm text-muted-foreground">
+            <Link href="#" className="font-semibold text-primary">
+              General
+            </Link>
+            <Link href="#">Security</Link>
+            <Link href="#">Integrations</Link>
+            <Link href="#">Support</Link>
+            <Link href="#">Organizations</Link>
+            <Link href="#">Advanced</Link>
+          </nav>
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Theme Settings</CardTitle>
+                <CardDescription>Customize the appearance of your application</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="auto-theme">Automatic theme</Label>
+                  <Switch
+                    id="auto-theme"
+                    checked={autoTheme}
+                    onCheckedChange={handleAutoThemeToggle}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="theme-select">Select theme</Label>
+                  <Select
+                    value={theme}
+                    onValueChange={handleThemeChange}
+                    disabled={autoTheme}
+                  >
+                    <SelectTrigger id="theme-select">
+                      <SelectValue placeholder="Select a theme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">
+                        <div className="flex items-center gap-2">
+                          <Sun className="h-4 w-4" />
+                          Light
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="dark">
+                        <div className="flex items-center gap-2">
+                          <Moon className="h-4 w-4" />
+                          Dark
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Backup Download</CardTitle>
+                <CardDescription>Download a complete backup of the database</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={handleDownload}>Download Backup</Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Backup Upload</CardTitle>
+                <CardDescription>Upload a complete backup of the database</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="picture">File</Label>
+                  <Input id="picture" type="file" onChange={handleFileChange} />
+                </div>
+                <Button onClick={handleUpload}>Upload Backup</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
     </div>
   )
