@@ -46,7 +46,16 @@ import Link from 'next/link';
 import SessionMenu from '@/components/compopages/SessionMenu';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig, Item, User } from '@/types/item';
+import { firebaseConfig, User } from '@/types/item';
+
+export interface Item {
+  itemCode: string;
+  itemType: string;
+  boxNumber: string;
+  spaceNumber: string;
+  examType: string;
+  status: string;
+};
 
 const formSchema = z.object({
   itemCode: z.string().nonempty("Código do item é obrigatório."),

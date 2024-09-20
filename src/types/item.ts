@@ -1,6 +1,6 @@
 // src/types/item.ts
 export interface Item {
-    // createdAt: string | number | Date;
+    createdAt: string | number | Date;
     itemCode: string;
     itemType: string;
     boxNumber: string;

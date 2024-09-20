@@ -25,15 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-export interface Item {
-  createdAt: string | number | Date;
-  itemCode: string;
-  itemType: string;
-  boxNumber: string;
-  spaceNumber: string;
-  examType: string;
-  status: string;
-};
+import { Item } from '@/types/item'
+
 
 interface VisaoGeralProps {
   items: Item[]
