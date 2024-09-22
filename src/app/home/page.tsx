@@ -61,12 +61,6 @@ const Home = () => {
           </div>
           <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
             <CommandDialogSearch items={items} onSelectItem={handleSelectItem} />
-            <Button asChild className="w-full sm:w-auto">
-              <Link href="/register">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Fazer arquivamento
-              </Link>
-            </Button>
             <SessionMenu userName={user.name} userPhoto={user.photo} auth={auth} />
           </div>
         </header>

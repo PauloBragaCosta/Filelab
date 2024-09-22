@@ -26,6 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Item } from '@/types/item'
+import { StatusPieChart } from './status-chart'
+import ItemCreationChart from './item-creation-chart'
+import LaminaRegistrationChart from './lamina-registration-chart'
+import TaxaUtilizacaoCard from './taxa-utilizacao-card'
+import RegistrationCard from './registration-card'
 
 
 interface VisaoGeralProps {
@@ -90,11 +95,12 @@ export default function VisaoGeral({ items }: VisaoGeralProps) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <OverviewCard title="Total de blocos arquivados" value={countBlocos} change="+10%" />
-        <OverviewCard title="Total de lâminas arquivadas" value={countLaminas} change="+15%" />
-        <OverviewCard title="Pedidos de retiradas" value={12234} change="+19% do mês passado" />
-        <OverviewCard title="Blocos e lâminas pesquisados" value={573} change="+201 desde a última hora" />
+        <RegistrationCard />
+        <ItemCreationChart items={items} />
+        <LaminaRegistrationChart items={items} />
+        <TaxaUtilizacaoCard items={items} />
       </div>
+
       <Card>
         <Card>
           <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
