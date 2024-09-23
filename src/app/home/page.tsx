@@ -50,7 +50,7 @@ const Home = () => {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col">
       <div className="flex flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 md:space-y-8 md:p-8">
         <header className="sticky top-0 z-30 flex flex-col items-start gap-4 border-b bg-background p-4 sm:flex-row sm:items-center sm:justify-between sm:border-0 sm:bg-transparent sm:p-0">
           <div className="flex items-center gap-4">
