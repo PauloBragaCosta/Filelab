@@ -5,7 +5,7 @@ import { Menu, Package2 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { initializeApp } from 'firebase/app'
-import { getAuth, onAuthStateChanged, User, signOut } from 'firebase/auth'
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth'
 import { firebaseConfig } from "@/types/item"
 
 
@@ -16,26 +16,15 @@ const auth = getAuth(app)
 
 export default function LandingPage() {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser)
-      setLoading(false)
     })
 
     return () => unsubscribe()
   }, [])
-
-  const handleSignOut = () => {
-    signOut(auth).catch((error) => console.error('Erro ao fazer logout:', error))
-  }
-
-  if (loading) {
-    return <div>Carregando...</div>
-  }
-
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900">
@@ -63,15 +52,12 @@ export default function LandingPage() {
           </Button>
           <Link href="/home" className="w-full lg:w-auto">
             {user ? (
-              <Link href="/home" className="w-full lg:w-auto">
                 <Button variant="ghost" className="w-full lg:w-auto text-xs lg:text-sm">Dashboard</Button>
-              </Link>
             ) : (
-              <Link href="/signin" className="w-full lg:w-auto">
                 <Button className="w-full lg:w-auto text-xs lg:text-sm">Entrar</Button>
-              </Link>
             )}
           </Link>
+
         </nav>
       </header>
       <main className="flex-1">

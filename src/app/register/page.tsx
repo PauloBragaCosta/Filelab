@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Check,
   Trash,
@@ -41,12 +41,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LockClosedIcon, LockOpen2Icon } from '@radix-ui/react-icons';
 import { useItems } from '@/hooks/useItems';
 import { toast, Toaster } from "sonner";
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import SessionMenu from '@/components/compopages/SessionMenu';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig, User } from '@/types/item';
+import useFirebaseAuth from '@/hooks/useFirebaseAuth';
+
 
 export interface Item {
   itemCode: string;
@@ -69,15 +67,9 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export default function Home() {
-  const router = useRouter();
-  const { items, fetchItems } = useItems();
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const [selectedTab, setSelectedTab] = useState<string>("overview");
-  const tabsTriggerRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
-  const itemsFetchedRef = useRef(false);
+  const { items } = useItems();
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [existingItems, setExistingItems] = useState<Item[]>([]);
-  const [errorMessage, setErrorMessage] = useState('');
   const [buttonVariant, setButtonVariant] = useState<"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success">("default");
   const [buttonAddVariant, setbuttonAddVariant] = useState<"default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "success">("default");
   const [buttonStatus, setButtonStatus] = useState("");
@@ -85,6 +77,7 @@ export default function Home() {
   const [itemTypeDefaut, setItemTypeDefaut] = useState("");
   const [examTypeDefaut, setExamTypeDefaut] = useState("");
   const [disabledForm, setDisabledForm] = useState(false);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -97,51 +90,15 @@ export default function Home() {
     },
   });
 
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser({
-          name: firebaseUser.displayName || "Usuário",
-          photo: firebaseUser.photoURL || "",
-        });
-        setLoading(false);
-      } else {
-        setUser(null);
-        setLoading(false);
-        router.push('/signin');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth, router]);
-
-  useEffect(() => {
-    if (!itemsFetchedRef.current && user) {
-      fetchItems();
-      itemsFetchedRef.current = true;
-    }
-  }, [fetchItems, user]);
-
-  useEffect(() => {
-    if (tabsTriggerRefs.current[selectedTab]) {
-      tabsTriggerRefs.current[selectedTab]?.click();
-    }
-  }, [selectedTab]);
+  const { user, loading, auth } = useFirebaseAuth();
 
   if (loading) {
     return <p>Carregando...</p>;
   }
 
   if (!user) {
-    return null; // This will prevent any content from rendering while redirecting
+    return null; // Isso impede que qualquer conteúdo seja renderizado enquanto redireciona
   }
-
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     // Verifica se o itemCode já existe em items
@@ -204,7 +161,6 @@ export default function Home() {
       });
 
       if (response.ok) {
-        const result = await response.json();
         setButtonStatus("success");
         setButtonVariant("success");
         setDisabledButton(false);
@@ -241,8 +197,6 @@ export default function Home() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Toaster />
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
-
       <div className="flex flex-col p-4 sm:p-6 md:p-8">
         <div className="flex flex-col space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">

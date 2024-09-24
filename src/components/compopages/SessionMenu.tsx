@@ -55,7 +55,7 @@ export default function SessionMenu({ userName, userPhoto, auth }: SessionMenuPr
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+        <DropdownMenuLabel>{userName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Link href="/home">Início</Link>

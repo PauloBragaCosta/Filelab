@@ -22,41 +22,16 @@ import {
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import SessionMenu from '@/components/compopages/SessionMenu'
-import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
-import { firebaseConfig, User } from '@/types/item'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { initializeApp } from 'firebase/app'
+import useFirebaseAuth from '@/hooks/useFirebaseAuth'
 
 export default function SettingsPage() {
-  const router = useRouter();
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [autoTheme, setAutoTheme] = useState(false)
   const [file, setFile] = useState<File | null>(null);
 
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser({
-          name: firebaseUser.displayName || "Usuário",
-          photo: firebaseUser.photoURL || "",
-        });
-        setLoading(false);
-      } else {
-        setUser(null);
-        setLoading(false);
-        router.push('/signin');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth, router]);
+  const { user, loading, auth } = useFirebaseAuth();
 
   useEffect(() => {
     setMounted(true)

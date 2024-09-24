@@ -1,25 +1,18 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { initializeApp } from 'firebase/app'
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useRouter } from 'next/navigation'
-import { firebaseConfig } from '@/types/item'
-import { Loader2, Moon, Sun } from 'lucide-react'
-import { useTheme } from 'next-themes'
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import useAuth from '@/hooks/useAuth';
 
 export default function AuthPage() {
-    const router = useRouter();
     const { theme, setTheme } = useTheme();
+    const { handleAuth, isLoading, error } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,51 +20,21 @@ export default function AuthPage() {
     const [lastName, setLastName] = useState('');
     const [profilePicture, setProfilePicture] = useState<File | null>(null);
     const [isLogin, setIsLogin] = useState(true);
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    const handleAuth = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setIsLoading(true);
-
-        try {
-            if (isLogin) {
-                await signInWithEmailAndPassword(auth, email, password);
-                console.log('Usuário logado com sucesso!');
-                router.push('/home');
-            } else {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // Atualiza o perfil com nome completo e foto de perfil
-                if (user && profilePicture) {
-                    const photoURL = URL.createObjectURL(profilePicture);
-                    await updateProfile(user, {
-                        displayName: `${firstName} ${lastName}`,
-                        photoURL: photoURL
-                    });
-                    console.log('Usuário criado com sucesso e perfil atualizado!');
-                }
-                router.push('/home');
-            }
-        } catch (error) {
-            setError('Erro de autenticação. Por favor, tente novamente.');
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setProfilePicture(e.target.files[0]);
         }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        handleAuth(email, password, isLogin, firstName, lastName, profilePicture);
     };
 
     if (!mounted) return null;
@@ -95,7 +58,7 @@ export default function AuthPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleAuth} className="grid gap-4">
+                    <form onSubmit={handleSubmit} className="grid gap-4">
                         {!isLogin && (
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
