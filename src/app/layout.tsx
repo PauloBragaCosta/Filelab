@@ -1,7 +1,7 @@
 // layout.js
 import "@/styles/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 export default function RootLayout({
@@ -12,19 +12,20 @@ export default function RootLayout({
   // You can use fontSans here if needed
   return (
     <>
-        <html lang="pt-BR" suppressHydrationWarning>
-          <head />
-          <body>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-            </ThemeProvider>
-          </body>
-        </html>
+      <html lang="pt-BR" suppressHydrationWarning>
+        <SpeedInsights />
+        <head />
+        <body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
     </>
   )
 }

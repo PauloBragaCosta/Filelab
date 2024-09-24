@@ -36,6 +36,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-hook/media-query": "^1.1.1",
     "@types/react-window": "^1.8.8",
+    "@vercel/speed-insights": "^1.0.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",

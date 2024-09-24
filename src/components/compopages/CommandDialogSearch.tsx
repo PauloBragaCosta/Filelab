@@ -85,7 +85,7 @@ export function CommandDialogSearch({ items, onSelectItem }: CommandDialogSearch
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Search Items</DrawerTitle>
+          <DrawerTitle>Buscar pelo id</DrawerTitle>
           <DrawerDescription>
             Search for items by code or type.
           </DrawerDescription>
