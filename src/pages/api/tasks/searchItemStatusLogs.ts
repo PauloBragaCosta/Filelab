@@ -32,7 +32,7 @@ export default async function handler(
     const responseLogs: ItemStatusLog[] = itemStatusLogs.map((log) => ({
       id: log.id.toString(), // Converte `id` para string
       itemCode: log.itemCode,
-      UserCreated: log.UserCreated,
+      UserCreated: log.userCreated,
       observation: log.observation,
       status: log.status,
       createdAt: log.createdAt.toISOString(), // Converte Date para string

@@ -1,7 +1,6 @@
 // layout.js
 import "@/styles/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 export default function RootLayout({
@@ -13,7 +12,6 @@ export default function RootLayout({
   return (
     <>
       <html lang="pt-BR" suppressHydrationWarning>
-        <SpeedInsights />
         <head />
         <body>
           <ThemeProvider

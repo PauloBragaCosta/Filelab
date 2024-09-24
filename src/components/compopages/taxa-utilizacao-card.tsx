@@ -8,18 +8,17 @@
 "use client"
 
 import { useMemo } from 'react'
-import { RadialBarChart, RadialBar, PolarRadiusAxis, Label, XAxis, Area, YAxis, AreaChart } from "recharts"
+import { XAxis, Area, YAxis, AreaChart } from "recharts"
 import { TrendingUp } from "lucide-react"
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer } from "@/components/ui/chart"
 import type { Item } from '@/types/item'
 
 interface TaxaUtilizacaoCardProps {

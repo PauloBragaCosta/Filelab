@@ -6,9 +6,17 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         if (req.method === 'GET') {
-            const items = await prisma.item.findMany({
+            // Busca os blocos e lâminas
+            const blocks = await prisma.block.findMany({
                 orderBy: { createdAt: 'desc' }, // Ordena pelos mais recentes
             });
+            
+            const slides = await prisma.slide.findMany({
+                orderBy: { createdAt: 'desc' }, // Ordena pelos mais recentes
+            });
+
+            // Combina os resultados em um único array
+            const items = [...blocks, ...slides];
 
             return res.status(200).json({ items });
         } else {

@@ -26,7 +26,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Item } from '@/types/item'
-import { StatusPieChart } from './status-chart'
 import ItemCreationChart from './item-creation-chart'
 import LaminaRegistrationChart from './lamina-registration-chart'
 import TaxaUtilizacaoCard from './taxa-utilizacao-card'

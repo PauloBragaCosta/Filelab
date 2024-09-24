@@ -15,14 +15,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Invalid request payload' });
     }
 
+    // Filtra os itens em blocos e lâminas
+    const blocksToCreate = items.filter(item => item.itemType === 'bloco');
+    const slidesToCreate = items.filter(item => item.itemType === 'lamina');
+
     // Verifica itens existentes para evitar duplicatas
-    const existingItems = await prisma.item.findMany({
+    const existingBlocks = await prisma.block.findMany({
       where: {
         itemCode: {
-          in: items.map((item: any) => item.itemCode),
+          in: blocksToCreate.map((item: any) => item.itemCode),
         },
       },
     });
+
+    const existingSlides = await prisma.slide.findMany({
+      where: {
+        itemCode: {
+          in: slidesToCreate.map((item: any) => item.itemCode),
+        },
+      },
+    });
+
+    const existingItems = [...existingBlocks, ...existingSlides];
 
     if (existingItems.length > 0) {
       // Retorna os itens existentes junto com o erro
@@ -40,14 +54,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Cria novos itens
-    const createdItems = await prisma.item.createMany({
-      data: items,
+    const createdBlocks = await prisma.block.createMany({
+      data: blocksToCreate,
+      skipDuplicates: true,
+    });
+
+    const createdSlides = await prisma.slide.createMany({
+      data: slidesToCreate,
       skipDuplicates: true,
     });
 
     res.status(201).json({ 
       message: 'Items created successfully', 
-      count: createdItems.count 
+      blocksCount: createdBlocks.count, 
+      slidesCount: createdSlides.count 
     });
 
   } catch (error) {

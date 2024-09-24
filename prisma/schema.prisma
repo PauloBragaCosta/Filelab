@@ -13,30 +13,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Item {
-  itemCode    String          @id @unique
-  itemType    String
-  boxNumber   String
-  spaceNumber String
-  examType    String
-  status      String
-  createdAt   DateTime        @default(now())
-  statusLogs  ItemStatusLog[]
+model Block {
+  itemCode      String          @id @unique
+  itemType      String
+  boxNumber     String
+  spaceNumber   String
+  examType      String
+  status        String
+  createdAt     DateTime        @default(now())
+  statusLogs    ItemStatusLog[] @relation("BlockStatusLogs")
+}
+
+model Slide {
+  itemCode      String          @id @unique
+  itemType      String
+  boxNumber     String
+  spaceNumber   String
+  examType      String
+  status        String
+  createdAt     DateTime        @default(now())
+  statusLogs    ItemStatusLog[] @relation("SlideStatusLogs")
 }
 
 model ItemStatusLog {
-  id          Int      @id @default(autoincrement())
-  itemCode    String
-  UserCreated String
-  observation String
-  status      String
-  createdAt   DateTime @default(now())
-  item        Item     @relation(fields: [itemCode], references: [itemCode])
+  id            Int      @id @default(autoincrement())
+  itemCode      String
+  userCreated   String
+  observation   String
+  status        String
+  createdAt     DateTime @default(now())
+  
+  // Referência para o modelo Block
+  block         Block?   @relation("BlockStatusLogs", fields: [itemCode], references: [itemCode], map: "Block_itemCode_fkey")
+  
+  // Referência para o modelo Slide
+  slide         Slide?   @relation("SlideStatusLogs", fields: [itemCode], references: [itemCode], map: "Slide_itemCode_fkey")
 }
 
 model User {
   id        Int      @id @default(autoincrement())
-  uid       String   @unique // Inicialmente opcional
+  uid       String?   @unique // Inicialmente opcional
   name      String?  @db.VarChar(255)
   photoURL  String?
   role      String   @default("user")

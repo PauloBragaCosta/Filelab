@@ -1,13 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState, KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { Button } from "@/components/ui/button"
-import { Search, X } from "lucide-react"
+import { Search } from "lucide-react"
 import { useDebounce } from 'use-debounce'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import {
