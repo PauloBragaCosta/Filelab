@@ -1,7 +1,9 @@
 // pages/api/user/uidfind.ts
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '@/lib/prisma'; // Certifique-se de que o Prisma Client esteja corretamente configurado
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Verifica se o método é POST

@@ -101,41 +101,52 @@ export default function Home() {
   }
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    // Verifica se o itemCode já existe em items
-    const itemExistsInItems = items.some(item => item.itemCode === data.itemCode);
-
-    // Verifica se o itemCode já existe em itemsList
-    const itemExistsInItemsList = itemsList.some(item => item.itemCode === data.itemCode);
-
-    if (itemExistsInItems || itemExistsInItemsList) {
-      setbuttonAddVariant("destructive");
-
-      if (itemExistsInItems) {
-        toast.error("Item com este código já existe em SERVIDOR VERCEL.");
-      }
-      if (itemExistsInItemsList) {
-        toast.error("Item com este código já existe em LISTA.");
-      }
-
-    } else {
-      const newItem = {
+    const newItem = {
         itemCode: data.itemCode,
         itemType: data.itemType,
         boxNumber: data.boxNumber,
         spaceNumber: data.spaceNumber,
         examType: data.examType,
         status: "arquivado",
-      };
+    };
 
-      setItemsList((prevItems) => [...prevItems, newItem]);
-      setItemTypeDefaut(data.itemType);
-      setExamTypeDefaut(data.examType);
-      setDisabledForm(true);
-      setbuttonAddVariant("default");
-      setDisabledButton(false);
-      toast.success("Item adicionado com sucesso!");
+    // Função para verificar se o item já existe em alguma lista
+    const itemExists = (item: typeof newItem, list: typeof newItem[]): boolean => {
+        return list.some(listItem => 
+            listItem.itemCode === item.itemCode && listItem.itemType === item.itemType
+        );
+    };
+
+    // Verifica na lista local e na lista do servidor
+    if (itemExists(newItem, itemsList)) {
+        setbuttonAddVariant("destructive");
+        toast.error("Item com este código já existe em LISTA.");
+        return;
     }
-  };
+
+    if (itemExists(newItem, items)) {
+        setbuttonAddVariant("destructive");
+        if (newItem.itemType === "blocos") {
+            toast.error("Item com este código já existe em bloco no SERVIDOR VERCEL.");
+        } else if (newItem.itemType === "laminas") {
+            toast.error("Item com este código já existe em lâmina no SERVIDOR VERCEL.");
+        } else {
+            toast.error("Item com este código já existe no SERVIDOR VERCEL.");
+        }
+        return;
+    }
+
+    // Se não existe em nenhuma lista, permite a inserção
+    setItemsList((prevItems) => [...prevItems, newItem]);
+    setItemTypeDefaut(data.itemType);
+    setExamTypeDefaut(data.examType);
+    setDisabledForm(true);
+    setbuttonAddVariant("default");
+    setDisabledButton(false);
+    toast.success("Item adicionado com sucesso!");
+};
+
+
 
   const handleSaveItems = async () => {
     try {
