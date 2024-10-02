@@ -39,7 +39,10 @@ export default async function handler(
         },
         include: {
           block: true
-        }
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
     } else if (itemType === 'lamina') {
       itemStatusLogs = await prisma.itemStatusLog.findMany({
@@ -49,7 +52,10 @@ export default async function handler(
         },
         include: {
           slide: true
-        }
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
     } else {
       return res.status(400).json({ error: 'Invalid item type' });
@@ -64,9 +70,13 @@ export default async function handler(
       itemType: log.itemType
     }));
 
+    console.log(responseLogs);
+
     res.status(200).json(responseLogs);
   } catch (error) {
     console.error('Error fetching item status logs:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+    await prisma.$disconnect();
   }
 }

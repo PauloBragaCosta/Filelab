@@ -11,6 +11,7 @@ import SessionMenu from '@/components/compopages/SessionMenu'
 import dynamic from 'next/dynamic'
 import useFirebaseAuth from '@/hooks/useFirebaseAuth'
 import { useItemStatusLogs } from '@/hooks/useItemStatusLogs'
+import Header from '@/components/compopages/header'
 
 // Importing components dynamically
 const VisaoGeral = dynamic(() => import('@/components/compopages/visaoGeral'), { ssr: false })
@@ -25,12 +26,12 @@ export default function Home() {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const [selectedTab, setSelectedTab] = useState<string>('overview')
 
-  const handleSelectItem = useCallback((itemCode: string) => {
-    const item = items.find((item) => item.itemCode === itemCode)
+  const handleSelectItem = useCallback((itemCode: string, itemType: string) => {
+    const item = items.find((item) => item.itemCode === itemCode && item.itemType === itemType)
     if (item) {
       setSelectedItem(item)
       setSelectedTab(item.itemType)
-      fetchItemStatusLogs(itemCode, item.itemType)
+      fetchItemStatusLogs(itemCode, itemType)
     }
   }, [items, fetchItemStatusLogs])
 
@@ -38,7 +39,7 @@ export default function Home() {
     if (selectedItem) {
       const updatedItem = { ...selectedItem, status: newStatus }
       setSelectedItem(updatedItem)
-      updateItem(updatedItem) // Assuming you have an updateItem function in your useItems hook
+      updateItem(updatedItem) // Supondo que você tenha uma função updateItem no seu hook useItems
     }
   }, [selectedItem, updateItem])
 
@@ -53,34 +54,49 @@ export default function Home() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <div className="flex flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 md:space-y-8 md:p-8">
-        <header className="sticky top-0 z-30 flex flex-col items-start gap-4 border-b bg-background p-4 sm:flex-row sm:items-center sm:justify-between sm:border-0 sm:bg-transparent sm:p-0">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Package2 className="h-6 w-6" />
-              <h1 className="text-xl font-bold tracking-tight sm:text-2xl">Arquivo de blocos e lâminas</h1>
-            </Link>
-          </div>
-          <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
-            <CommandDialogSearch items={items} onSelectItem={handleSelectItem} />
-            <SessionMenu userName={user.name} userPhoto={user.photo} auth={auth} />
-          </div>
-        </header>
+        <Header user={user} auth={auth} text="Arquivo de blocos e lâminas" />
         <div className="flex-1 space-y-4">
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
-            <TabsList className="flex flex-wrap justify-start gap-2">
-              <TabsTrigger value="overview" className="px-3 py-1.5 text-sm">
-                Visão geral
-              </TabsTrigger>
-              <TabsTrigger value="bloco" disabled={!selectedItem} className="px-3 py-1.5 text-sm">
-                Blocos
-              </TabsTrigger>
-              <TabsTrigger value="lamina" disabled={!selectedItem} className="px-3 py-1.5 text-sm">
-                Lâminas
-              </TabsTrigger>
-              <TabsTrigger value="notifications" disabled className="px-3 py-1.5 text-sm">
-                Expurgo
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex items-center gap-4">
+              <TabsList className="flex gap-2">
+                <TabsTrigger
+                  value="overview"
+                  className="inline-flex items-center px-3 py-1.5 text-sm"
+                  onClick={() => setSelectedTab('overview')}
+                >
+                  Visão geral
+                </TabsTrigger>
+
+                {/* Mostrar "Blocos" apenas quando `selectedTab` for 'bloco' */}
+                {selectedTab === 'bloco' && (
+                  <TabsTrigger
+                    value="bloco"
+                    disabled={!selectedItem}
+                    className="inline-flex items-center px-3 py-1.5 text-sm"
+                    onClick={() => setSelectedTab('bloco')}
+                  >
+                    Bloco
+                  </TabsTrigger>
+                )}
+
+                {/* Mostrar "Lâminas" apenas quando `selectedTab` for 'lamina' */}
+                {selectedTab === 'lamina' && (
+                  <TabsTrigger
+                    value="lamina"
+                    disabled={!selectedItem}
+                    className="inline-flex items-center px-3 py-1.5 text-sm"
+                    onClick={() => setSelectedTab('lamina')}
+                  >
+                    Lâmina
+                  </TabsTrigger>
+                )}
+              </TabsList>
+
+              {/* CommandDialogSearch aparece ao lado do TabsList */}
+              <CommandDialogSearch items={items} onSelectItem={handleSelectItem} />
+            </div>
+
+
             <TabsContent value="overview" className="space-y-4">
               <VisaoGeral items={items} />
             </TabsContent>

@@ -165,7 +165,7 @@ export default function Home() {
 
       const response = await fetch('/api/tasks/create', {
         method: 'POST',
-        body: JSON.stringify({ items: itemsToSave }),
+        body: JSON.stringify({ items: itemsToSave, userCreated: user.name } ),
         headers: {
           "Content-Type": "application/json",
         },

@@ -24,6 +24,7 @@ import { Switch } from '@/components/ui/switch'
 import SessionMenu from '@/components/compopages/SessionMenu'
 import { Input } from '@/components/ui/input'
 import useFirebaseAuth from '@/hooks/useFirebaseAuth'
+import Header from '@/components/compopages/header'
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
@@ -111,15 +112,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col p-4 sm:p-6 md:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Package2 className="h-6 w-6" />
-          <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
-        </Link>
-
-        <SessionMenu userName={user.name} userPhoto={user.photo} auth={auth} />
-      </header>
-
+      <Header user={user} auth={auth} text="Configurações" />
       <main className="flex-1 space-y-4 p-4 md:p-6">
       
         <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">

@@ -27,7 +27,7 @@ interface Item {
 
 interface CommandDialogSearchProps {
   items: Item[]
-  onSelectItem: (itemCode: string) => void
+  onSelectItem: (itemCode: string, itemType: string) => void
 }
 
 export function CommandDialogSearch({ items, onSelectItem }: CommandDialogSearchProps) {
@@ -46,29 +46,25 @@ export function CommandDialogSearch({ items, onSelectItem }: CommandDialogSearch
     return () => document.removeEventListener("keydown", down)
   }, [])
 
-  const commonTriggerButton = (
-    <Button
-      variant="outline"
-      className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
-      onClick={() => setOpen(true)}
-    >
-      <Search className="mr-2 h-4 w-4" />
-      <span className="hidden lg:inline-flex">Search items...</span>
-      <span className="inline-flex lg:hidden">Search...</span>
-      <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-        <span className="text-xs">⌘</span>K
-      </kbd>
-    </Button>
-  )
-
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          {commonTriggerButton}
+          <Button
+            variant="outline"
+            className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
+            onClick={() => setOpen(true)}
+          >
+            <Search className="mr-2 h-4 w-4" />
+            <span className="hidden lg:inline-flex">Search items...</span>
+            <span className="inline-flex lg:hidden">Search...</span>
+            <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
-          
+
           <ProfileForm items={items} onSelectItem={onSelectItem} setOpen={setOpen} />
         </DialogContent>
       </Dialog>
@@ -78,7 +74,15 @@ export function CommandDialogSearch({ items, onSelectItem }: CommandDialogSearch
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        {commonTriggerButton}
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10"
+          onClick={() => setOpen(true)}
+        >
+          <Search className="h-4 w-4" />
+          <span className="sr-only">Search items</span>
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
@@ -124,14 +128,14 @@ function ProfileForm({ items, onSelectItem, setOpen }: ProfileFormProps) {
     })
   }, [filteredItems])
 
-  const handleSelect = useCallback((currentValue: string) => {
+  const handleSelect = useCallback((itemCode: string, itemType: string) => {
     setOpen(false)
-    onSelectItem(currentValue)
+    onSelectItem(itemCode, itemType)
   }, [onSelectItem, setOpen])
 
   const handleKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && sortedItems.length > 0) {
-      handleSelect(sortedItems[0].itemCode)
+      handleSelect(sortedItems[0].itemCode, sortedItems[0].itemType)
     }
   }
 
@@ -155,7 +159,7 @@ function ProfileForm({ items, onSelectItem, setOpen }: ProfileFormProps) {
               <li
                 key={item.itemCode}
                 className="flex items-center justify-between px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer"
-                onClick={() => handleSelect(item.itemCode)}
+                onClick={() => handleSelect(item.itemCode, item.itemType)}
               >
                 <span>{item.itemCode}</span>
                 <span className="text-muted-foreground">{item.itemType}</span>

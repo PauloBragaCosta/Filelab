@@ -6,8 +6,7 @@ export function useItemStatusLogs() {
   const [itemStatusLogs, setItemStatusLogs] = useState([]);
 
   const fetchItemStatusLogs = async (itemCode: string, itemType: string) => {
-    console.log(itemCode)
-    console.log(itemType)
+ 
 
     try {
       const response = await fetch('/api/tasks/searchItemStatusLogs', {
