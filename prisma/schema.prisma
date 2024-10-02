@@ -13,6 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ItemStatusLog {
+  id            Int      @id @default(autoincrement())
+  userCreated   String
+  observation   String
+  status        String
+  createdAt     DateTime @default(now())
+  itemType      String   // Novo campo para identificar o tipo de item (Block ou Slide)
+  
+  // Referência opcional para o modelo Block
+  blockId       String?
+  block         Block?   @relation("BlockStatusLogs", fields: [blockId], references: [itemCode])
+  
+  // Referência opcional para o modelo Slide
+  slideId       String?
+  slide         Slide?   @relation("SlideStatusLogs", fields: [slideId], references: [itemCode])
+
+  @@index([blockId])
+  @@index([slideId])
+}
+
+// Atualize também os modelos Block e Slide para refletir essas mudanças
+
 model Block {
   itemCode      String          @id @unique
   itemType      String
@@ -33,21 +55,6 @@ model Slide {
   status        String
   createdAt     DateTime        @default(now())
   statusLogs    ItemStatusLog[] @relation("SlideStatusLogs")
-}
-
-model ItemStatusLog {
-  id            Int      @id @default(autoincrement())
-  itemCode      String
-  userCreated   String
-  observation   String
-  status        String
-  createdAt     DateTime @default(now())
-  
-  // Referência para o modelo Block
-  block         Block?   @relation("BlockStatusLogs", fields: [itemCode], references: [itemCode], map: "Block_itemCode_fkey")
-  
-  // Referência para o modelo Slide
-  slide         Slide?   @relation("SlideStatusLogs", fields: [itemCode], references: [itemCode], map: "Slide_itemCode_fkey")
 }
 
 model User {

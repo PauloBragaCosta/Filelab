@@ -1,68 +1,32 @@
 import * as React from "react"
-
-import { cn } from "@/lib/utils"
+import { useSearchParams } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import { useMediaQuery } from "@react-hook/media-query"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import {
-  Loader2,
-  PlusIcon,
-} from "lucide-react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useForm } from "react-hook-form"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Textarea } from "../ui/textarea"
-import { useState } from "react"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-
-type FormData = {
-  itemCode: string;
-  UserCreated: string;
-  status: string;
-  observation: string;
-};
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Loader2, PlusIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
-  itemCode: z.string(),
-  UserCreated: z.string().min(2, { message: "User must be at least 2 characters." }),
   status: z.string(),
   observation: z.string().min(1, { message: "Observation is required." }),
 })
 
-export function RegisterLog() {
+interface RegisterLogProps {
+  onStatusChange: (newStatus: string) => void;
+  currentItemCode: string;
+  currentItemType: string;
+  currentUserName: string;
+}
+
+export function RegisterLog({ onStatusChange, currentItemCode, currentItemType, currentUserName }: RegisterLogProps) {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
@@ -72,17 +36,24 @@ export function RegisterLog() {
         <DialogTrigger asChild>
           <Button variant="outline">
             <PlusIcon className="mr-2 h-4 w-4" />
-            mudar status
+            Mudar status
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>Registrar Log</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
+              Registre uma nova atualização de status para este item.
             </DialogDescription>
           </DialogHeader>
-          <ProfileForm setOpen={setOpen} />
+          <ProfileForm
+            className="px-4"
+            setOpen={setOpen}
+            onStatusChange={onStatusChange}
+            currentItemCode={currentItemCode}
+            currentItemType={currentItemType}
+            currentUserName={currentUserName}
+          />
         </DialogContent>
       </Dialog>
     )
@@ -93,20 +64,27 @@ export function RegisterLog() {
       <DrawerTrigger asChild>
         <Button variant="outline" size="icon">
           <PlusIcon className="h-4 w-4" />
-          <span className="sr-only">Add Log</span>
+          <span className="sr-only">Adicionar Log</span>
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
+          <DrawerTitle>Registrar Log</DrawerTitle>
           <DrawerDescription>
-            Make changes to your profile here. Click save when you're done.
+            Registre uma nova atualização de status para este item.
           </DrawerDescription>
         </DrawerHeader>
-        <ProfileForm className="px-4" setOpen={setOpen} />
+        <ProfileForm
+          className="px-4"
+          setOpen={setOpen}
+          onStatusChange={onStatusChange}
+          currentItemCode={currentItemCode}
+          currentItemType={currentItemType}
+          currentUserName={currentUserName}
+        />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancelar</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -114,35 +92,39 @@ export function RegisterLog() {
   )
 }
 
-function ProfileForm({ className, setOpen }: React.ComponentProps<"form"> & { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
-  const router = useRouter();
+interface ProfileFormProps extends React.ComponentProps<"form"> {
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onStatusChange: (newStatus: string) => void;
+  currentItemCode: string;
+  currentItemType: string;
+  currentUserName: string;
+}
 
-  const searchParams = useSearchParams();
-  const itemCode = searchParams?.get('itemCode');
-
-  const { register, handleSubmit, reset } = useForm<FormData>();
-
-  const [buttonStatus, setButtonStatus] = useState("");
+function ProfileForm({ className, setOpen, onStatusChange, currentItemCode, currentItemType, currentUserName }: ProfileFormProps) {
+  const [buttonStatus, setButtonStatus] = React.useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      itemCode: `${itemCode}`,
-      UserCreated: "",
+      status: "",
       observation: "",
     },
   })
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setButtonStatus("Loading")
-    console.log(data)
     try {
       const response = await fetch('/api/tasks/createLog', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          itemCode: currentItemCode,
+          itemType:currentItemType,
+          userCreated: currentUserName,
+        }),
       });
 
       if (!response.ok) {
@@ -152,9 +134,7 @@ function ProfileForm({ className, setOpen }: React.ComponentProps<"form"> & { se
       const result = await response.json();
       console.log('Log created:', result);
 
-      router.refresh;
-      // Reset the form fields
-      // Close the drawer
+      onStatusChange(data.status);
       setOpen(false);
     } catch (error) {
       console.error('Error creating log:', error);
@@ -165,32 +145,6 @@ function ProfileForm({ className, setOpen }: React.ComponentProps<"form"> & { se
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-8", className)}>
-        <FormField
-          control={form.control}
-          name="itemCode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Item Code</FormLabel>
-              <FormControl>
-                <Input {...field} readOnly />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="UserCreated"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>User Created</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter user name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="status"
@@ -218,24 +172,26 @@ function ProfileForm({ className, setOpen }: React.ComponentProps<"form"> & { se
           name="observation"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Observation</FormLabel>
+              <FormLabel>Observação</FormLabel>
               <FormControl>
-                <Textarea placeholder="Type your observation here." {...field} />
+                <Textarea placeholder="Digite sua observação aqui." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {buttonStatus === "Loading" ? (
-          <Button type="submit" disabled>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Loading
-          </Button>
-        ) : buttonStatus === "Error" ? (
-          <Button type="submit">Edit again and click here</Button>
-        ) : (
-          <Button type="submit">Save</Button>
-        )}
+        <Button type="submit" disabled={buttonStatus === "Loading"}>
+          {buttonStatus === "Loading" ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Carregando
+            </>
+          ) : buttonStatus === "Error" ? (
+            "Tentar novamente"
+          ) : (
+            "Salvar"
+          )}
+        </Button>
       </form>
     </Form>
   )

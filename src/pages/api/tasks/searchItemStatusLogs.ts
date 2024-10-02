@@ -4,12 +4,12 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 type ItemStatusLog = {
-  id: string;
-  itemCode: string;
-  UserCreated: string;
+  id: number;
+  userCreated: string;
   observation: string;
   status: string;
-  createdAt: string; // `createdAt` agora é uma string no tipo
+  createdAt: string;
+  itemType: string;
 };
 
 type Data = ItemStatusLog[] | { error: string };
@@ -18,24 +18,50 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const { itemCode } = req.body;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
 
-  if (!itemCode || typeof itemCode !== 'string') {
-    return res.status(400).json({ error: 'Item code is required' });
+  const { itemCode, itemType } = req.body;
+
+  if (!itemCode || typeof itemCode !== 'string' || !itemType || typeof itemType !== 'string') {
+    return res.status(400).json({ error: 'Item code and item type are required' });
   }
 
   try {
-    const itemStatusLogs = await prisma.itemStatusLog.findMany({
-      where: { itemCode },
-    });
+    let itemStatusLogs;
+
+    if (itemType === 'bloco') {
+      itemStatusLogs = await prisma.itemStatusLog.findMany({
+        where: {
+          itemType: 'bloco',
+          blockId: itemCode
+        },
+        include: {
+          block: true
+        }
+      });
+    } else if (itemType === 'lamina') {
+      itemStatusLogs = await prisma.itemStatusLog.findMany({
+        where: {
+          itemType: 'lamina',
+          slideId: itemCode
+        },
+        include: {
+          slide: true
+        }
+      });
+    } else {
+      return res.status(400).json({ error: 'Invalid item type' });
+    }
 
     const responseLogs: ItemStatusLog[] = itemStatusLogs.map((log) => ({
-      id: log.id.toString(), // Converte `id` para string
-      itemCode: log.itemCode,
-      UserCreated: log.userCreated,
+      id: log.id,
+      userCreated: log.userCreated,
       observation: log.observation,
       status: log.status,
-      createdAt: log.createdAt.toISOString(), // Converte Date para string
+      createdAt: log.createdAt.toISOString(),
+      itemType: log.itemType
     }));
 
     res.status(200).json(responseLogs);

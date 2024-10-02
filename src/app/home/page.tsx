@@ -1,52 +1,53 @@
-"use client"
+'use client'
 
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Link from 'next/link';
-import { Package2, PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { CommandDialogSearch } from '@/components/compopages/CommandDialogSearch';
-import { useItems } from '@/hooks/useItems';
-import { useItemStatusLogs } from '@/hooks/useItemStatusLogs';
-import { Item } from '@/types/item';
-import SessionMenu from '@/components/compopages/SessionMenu';
-import dynamic from 'next/dynamic';
-import useFirebaseAuth from '@/hooks/useFirebaseAuth';
+import React, { useCallback, useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Link from 'next/link'
+import { Package2 } from 'lucide-react'
+import { CommandDialogSearch } from '@/components/compopages/CommandDialogSearch'
+import { useItems } from '@/hooks/useItems'
+import { Item } from '@/types/item'
+import SessionMenu from '@/components/compopages/SessionMenu'
+import dynamic from 'next/dynamic'
+import useFirebaseAuth from '@/hooks/useFirebaseAuth'
+import { useItemStatusLogs } from '@/hooks/useItemStatusLogs'
 
-// Importando componentes dinamicamente
-const VisaoGeral = dynamic(() => import('@/components/compopages/visaoGeral'), { ssr: false });
-const ItemDetails = dynamic(() => import('@/components/compopages/ItemDetails'), { ssr: false });
-const ItemStatusLogsTable = dynamic(() => import('@/components/compopages/ItemStatusLogsTable'), { ssr: false });
-const BoxSpaceItems = dynamic(() => import('@/components/compopages/BoxSpaceItems'), { ssr: false });
+// Importing components dynamically
+const VisaoGeral = dynamic(() => import('@/components/compopages/visaoGeral'), { ssr: false })
+const ItemDetails = dynamic(() => import('@/components/compopages/ItemDetails'), { ssr: false })
+const ItemStatusLogsTable = dynamic(() => import('@/components/compopages/ItemStatusLogsTable'), { ssr: false })
+const BoxSpaceItems = dynamic(() => import('@/components/compopages/BoxSpaceItems'), { ssr: false })
 
-const Home = () => {
-  const { user, loading, auth } = useFirebaseAuth();
-  const { items, fetchItems } = useItems();
-  const { itemStatusLogs, fetchItemStatusLogs } = useItemStatusLogs();
-  const [selectedItem, setSelectedItem] = React.useState<Item | null>(null);
-  const [selectedTab, setSelectedTab] = React.useState<string>('overview');
+export default function Home() {
+  const { user, loading, auth } = useFirebaseAuth()
+  const { items, updateItem } = useItems()
+  const { itemStatusLogs, fetchItemStatusLogs } = useItemStatusLogs()
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const [selectedTab, setSelectedTab] = useState<string>('overview')
 
-  React.useEffect(() => {
-    if (user && !items.length) {
-      fetchItems();
-    }
-  }, [user, items, fetchItems]);
-
-  const handleSelectItem = (itemCode: string) => {
-    const item = items.find((item) => item.itemCode === itemCode);
+  const handleSelectItem = useCallback((itemCode: string) => {
+    const item = items.find((item) => item.itemCode === itemCode)
     if (item) {
-      setSelectedItem(item);
-      setSelectedTab(item.itemType);
-      fetchItemStatusLogs(itemCode);
+      setSelectedItem(item)
+      setSelectedTab(item.itemType)
+      fetchItemStatusLogs(itemCode, item.itemType)
     }
-  };
+  }, [items, fetchItemStatusLogs])
+
+  const handleStatusChange = useCallback((newStatus: string) => {
+    if (selectedItem) {
+      const updatedItem = { ...selectedItem, status: newStatus }
+      setSelectedItem(updatedItem)
+      updateItem(updatedItem) // Assuming you have an updateItem function in your useItems hook
+    }
+  }, [selectedItem, updateItem])
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return <p>Carregando...</p>
   }
 
   if (!user) {
-    return null; // Isso impede que qualquer conteúdo seja renderizado enquanto redireciona
+    return null
   }
 
   return (
@@ -92,15 +93,40 @@ const Home = () => {
                       items={items}
                       boxNumber={selectedItem.boxNumber}
                       spaceNumber={selectedItem.spaceNumber}
-                      itemType={selectedItem.itemCode}
+                      itemType={selectedItem.itemType}
                     />
-                    <ItemStatusLogsTable logs={itemStatusLogs} />
+                    <ItemStatusLogsTable
+                      logs={itemStatusLogs}
+                      onStatusChange={handleStatusChange}
+                      currentItemCode={selectedItem.itemCode}
+                      currentItemType={selectedItem.itemType}
+                      currentUserName={user.name} // Pass the current user's name
+                    />
                   </div>
                 </>
               )}
             </TabsContent>
             <TabsContent value="lamina" className="space-y-4">
-              {/* Similar structure as "bloco" tab */}
+              {selectedItem && (
+                <>
+                  <ItemDetails item={selectedItem} />
+                  <div className="flex flex-col gap-4 md:flex-row">
+                    <BoxSpaceItems
+                      items={items}
+                      boxNumber={selectedItem.boxNumber}
+                      spaceNumber={selectedItem.spaceNumber}
+                      itemType={selectedItem.itemType}
+                    />
+                    <ItemStatusLogsTable
+                      logs={itemStatusLogs}
+                      onStatusChange={handleStatusChange}
+                      currentItemCode={selectedItem.itemCode}
+                      currentItemType={selectedItem.itemType}
+                      currentUserName={user.name} // Pass the current user's name
+                    />
+                  </div>
+                </>
+              )}
             </TabsContent>
             <TabsContent value="notifications" className="space-y-4">
               {/* Notifications content */}
@@ -109,7 +135,5 @@ const Home = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-export default Home;
+  )
+}

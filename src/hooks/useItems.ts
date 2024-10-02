@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Item } from '@/types/item';
 
 export function useItems() {
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingItens, setloadingItens] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchItems = async () => {
-    setLoading(true);
+  const fetchItems = useCallback(async () => {
+    setloadingItens(true);
     setError(null);
 
     try {
@@ -21,13 +21,21 @@ export function useItems() {
       setError((error as Error).message || 'An error occurred while fetching items');
       console.error('Error fetching overview data:', error);
     } finally {
-      setLoading(false);
+      setloadingItens(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchItems();
+  }, [fetchItems]);
+
+  const updateItem = useCallback((updatedItem: Item) => {
+    setItems(currentItems => 
+      currentItems.map(item => 
+        item.itemCode === updatedItem.itemCode ? { ...item, ...updatedItem } : item
+      )
+    );
   }, []);
 
-  return { items, fetchItems, loading, error };
+  return { items, fetchItems, loadingItens, error, updateItem };
 }

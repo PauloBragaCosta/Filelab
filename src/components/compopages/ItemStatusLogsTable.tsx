@@ -3,16 +3,23 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { RegisterLog } from '@/components/compopages/registerLog';
 
-// Defina a interface para os logs
 interface LogItem {
   id: string;
   UserCreated: string;
   status: string;
   observation: string;
-  createdAt: string; // Supondo que haja um campo createdAt
+  createdAt: string; 
 }
 
-export default function ItemStatusLogsTable({ logs }: { logs: LogItem[] }) {
+interface ItemStatusLogsTableProps {
+  logs: LogItem[];
+  onStatusChange: (newStatus: string) => void;
+  currentItemCode: string;
+  currentItemType: string;
+  currentUserName: string; // Add this prop
+}
+
+export default function ItemStatusLogsTable({ logs, onStatusChange, currentItemCode, currentItemType, currentUserName }: ItemStatusLogsTableProps) {
   return (
     <Card className="flex-[2] space-y-4">
       <CardHeader className="px-7">
@@ -21,7 +28,12 @@ export default function ItemStatusLogsTable({ logs }: { logs: LogItem[] }) {
             <CardTitle>Item Status Logs</CardTitle>
             <CardDescription>Recent item status updates.</CardDescription>
           </div>
-          <RegisterLog />
+          <RegisterLog 
+            onStatusChange={onStatusChange} 
+            currentItemCode={currentItemCode}
+            currentItemType={currentItemType}
+            currentUserName={currentUserName} // Pass the current user's name
+          />
         </div>
       </CardHeader>
       <CardContent>
