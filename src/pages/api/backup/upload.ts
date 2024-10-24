@@ -1,4 +1,3 @@
-// pages/api/backup/upload.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 
@@ -7,7 +6,7 @@ const prisma = new PrismaClient();
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '10mb', // Aumente o limite de tamanho, se necessário
+      sizeLimit: '10mb',
     },
   },
 };
@@ -17,56 +16,84 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const backupData = req.body;
 
-      // Limpa as tabelas existentes
-      await prisma.itemStatusLog.deleteMany(); // Deleta os logs antes para evitar problemas de integridade referencial
-      await prisma.slide.deleteMany();          // Deleta os slides
-      await prisma.block.deleteMany();          // Deleta os blocos
-      await prisma.user.deleteMany();           // Deleta os usuários
+      // Limpa todas as tabelas na ordem correta para evitar problemas de chave estrangeira
+      await prisma.itemStatusLog.deleteMany();
+      await prisma.hemograma.deleteMany();
+      await prisma.bioquimico.deleteMany();
+      await prisma.anatomiaPatologica.deleteMany();
+      await prisma.citologia.deleteMany();
+      await prisma.exam.deleteMany();
+      await prisma.patient.deleteMany();
+      await prisma.tutor.deleteMany();
+      await prisma.doctor.deleteMany();
+      await prisma.clinic.deleteMany();
+      await prisma.slide.deleteMany();
+      await prisma.block.deleteMany();
+      await prisma.user.deleteMany();
 
-      // Restaura os dados de usuários
+      // Restaura os dados na ordem correta
       await prisma.user.createMany({
-        data: backupData.users.map((user: any) => ({
-          uid: user.uid, // Certifique-se de que 'uid' está no backup
-          name: user.name,
-          photoURL: user.photoURL,
-          role: user.role,
-          createdAt: new Date(user.createdAt),
+        data: backupData.users,
+      });
+
+      await prisma.doctor.createMany({
+        data: backupData.doctors,
+      });
+
+      await prisma.clinic.createMany({
+        data: backupData.clinics,
+      });
+
+      await prisma.tutor.createMany({
+        data: backupData.tutors,
+      });
+
+      await prisma.patient.createMany({
+        data: backupData.patients,
+      });
+
+      await prisma.exam.createMany({
+        data: backupData.exams.map((exam: any) => ({
+          ...exam,
+          examDate: new Date(exam.examDate),
+          createdAt: new Date(exam.createdAt),
+          updatedAt: new Date(exam.updatedAt),
         })),
       });
 
-      // Restaura os dados de blocos
+      await prisma.hemograma.createMany({
+        data: backupData.hemogramas,
+      });
+
+      await prisma.bioquimico.createMany({
+        data: backupData.bioquimicos,
+      });
+
+      await prisma.anatomiaPatologica.createMany({
+        data: backupData.anatomiasPatologicas,
+      });
+
+      await prisma.citologia.createMany({
+        data: backupData.citologias,
+      });
+
       await prisma.block.createMany({
         data: backupData.blocks.map((block: any) => ({
-          itemCode: block.itemCode,
-          itemType: block.itemType,
-          boxNumber: block.boxNumber,
-          spaceNumber: block.spaceNumber,
-          examType: block.examType,
-          status: block.status,
+          ...block,
           createdAt: new Date(block.createdAt),
         })),
       });
 
-      // Restaura os dados de lâminas
       await prisma.slide.createMany({
         data: backupData.slides.map((slide: any) => ({
-          itemCode: slide.itemCode,
-          itemType: slide.itemType,
-          boxNumber: slide.boxNumber,
-          spaceNumber: slide.spaceNumber,
-          examType: slide.examType,
-          status: slide.status,
+          ...slide,
           createdAt: new Date(slide.createdAt),
         })),
       });
 
-      // Restaura os logs de status de itens, usando a chave correta do JSON
       await prisma.itemStatusLog.createMany({
-        data: backupData.itemStatusLog.map((log: any) => ({
-          itemCode: log.itemCode,
-          userCreated: log.userCreated, // Corrigido para 'userCreated' para seguir o padrão
-          observation: log.observation,
-          status: log.status,
+        data: backupData.itemStatusLogs.map((log: any) => ({
+          ...log,
           createdAt: new Date(log.createdAt),
         })),
       });
@@ -74,9 +101,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json({ message: 'Backup restaurado com sucesso!' });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Erro ao restaurar o backup.' });
+      res.status(500).json({ error: 'Erro ao restaurar o backup' });
     } finally {
-      await prisma.$disconnect(); // Fechar conexão com Prisma
+      await prisma.$disconnect();
     }
   } else {
     res.status(405).json({ message: 'Método não permitido' });

@@ -13,21 +13,143 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Doctor {
+  id                        String   @id @default(uuid())
+  nameMedico                String?
+  telephoneMedico           String?
+  emailMedico               String?  @unique
+  crmv                      String?
+  comunicacaoEmailsMedico   Boolean  @default(false)
+  marketingEmailsMedico     Boolean  @default(false)
+  comunicacaoWhatsappMedico Boolean  @default(false)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  exams                     Exam[]
+}
+
+model Clinic {
+  id              String   @id @default(uuid())
+  nameClinic      String
+  telephoneClinic String?
+  emailClinic     String?  @unique
+  Endereco        String?
+  CEP             String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  exams           Exam[]
+}
+
+model Patient {
+  id        String   @id @default(uuid())
+  name      String?
+  especie   String?
+  raca      String?
+  idade     Int?
+  sexo      String?
+  peso      Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tutor     Tutor    @relation(fields: [tutorId], references: [id])
+  tutorId   String
+  exams     Exam[]
+}
+
+model Tutor {
+  id                       String    @id @default(uuid())
+  nameTutor                String?
+  telephoneTutor           String?
+  emailTutor               String?   @unique
+  communicationEmailsTutor Boolean   @default(false)
+  socialWhatsappTutor      Boolean   @default(false)
+  marketingEmailsTutor     Boolean   @default(false)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  patients                 Patient[]
+}
+
+model Hemograma {
+  id        String   @id @default(uuid())
+  hemacias  Float?
+  plaquetas Float?
+  rdw       Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  examId    Int?     @unique
+  exam      Exam?    @relation(fields: [examId], references: [id])
+}
+
+model Bioquimico {
+  id         String   @id @default(uuid())
+  ureia      Float?
+  creatinina Float?
+  alt        Float?
+  ast        Float?
+  ggt        Float?
+  fa         Float?
+  proteina   Float?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  examId     Int?     @unique
+  exam       Exam?    @relation(fields: [examId], references: [id])
+}
+
+model AnatomiaPatologica {
+  id        String   @id @default(uuid())
+  biopsia   Boolean?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  examId    Int?     @unique
+  exam      Exam?    @relation(fields: [examId], references: [id])
+}
+
+model Citologia {
+  id              String   @id @default(uuid())
+  citologiaOuvido Boolean?
+  citologiaPele   Boolean?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  examId          Int?     @unique
+  exam            Exam?    @relation(fields: [examId], references: [id])
+}
+
+model Exam {
+  id          Int                 @id @default(autoincrement())
+  urgency     Boolean
+  examDate    DateTime
+  examType    String
+  description String?
+  result      String?
+  fileUrls    String[] // Array de URLs dos arquivos
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  patient     Patient             @relation(fields: [patientId], references: [id])
+  patientId   String
+  doctor      Doctor              @relation(fields: [doctorId], references: [id])
+  doctorId    String
+  criadoPor   String
+  hemograma   Hemograma?
+  bioquimico  Bioquimico?
+  anatomia    AnatomiaPatologica?
+  citologia   Citologia?
+  Clinic      Clinic?             @relation(fields: [clinicId], references: [id])
+  clinicId    String?
+}
+
 model ItemStatusLog {
-  id            Int      @id @default(autoincrement())
-  userCreated   String
-  observation   String
-  status        String
-  createdAt     DateTime @default(now())
-  itemType      String   // Novo campo para identificar o tipo de item (Block ou Slide)
-  
+  id          Int      @id @default(autoincrement())
+  userCreated String
+  observation String
+  status      String
+  createdAt   DateTime @default(now())
+  itemType    String // Novo campo para identificar o tipo de item (Block ou Slide)
+
   // Referência opcional para o modelo Block
-  blockId       String?
-  block         Block?   @relation("BlockStatusLogs", fields: [blockId], references: [itemCode])
-  
+  blockId String?
+  block   Block?  @relation("BlockStatusLogs", fields: [blockId], references: [itemCode])
+
   // Referência opcional para o modelo Slide
-  slideId       String?
-  slide         Slide?   @relation("SlideStatusLogs", fields: [slideId], references: [itemCode])
+  slideId String?
+  slide   Slide?  @relation("SlideStatusLogs", fields: [slideId], references: [itemCode])
 
   @@index([blockId])
   @@index([slideId])
@@ -36,30 +158,30 @@ model ItemStatusLog {
 // Atualize também os modelos Block e Slide para refletir essas mudanças
 
 model Block {
-  itemCode      String          @id @unique
-  itemType      String
-  boxNumber     String
-  spaceNumber   String
-  examType      String
-  status        String
-  createdAt     DateTime        @default(now())
-  statusLogs    ItemStatusLog[] @relation("BlockStatusLogs")
+  itemCode    String          @id @unique
+  itemType    String
+  boxNumber   String
+  spaceNumber String
+  examType    String
+  status      String
+  createdAt   DateTime        @default(now())
+  statusLogs  ItemStatusLog[] @relation("BlockStatusLogs")
 }
 
 model Slide {
-  itemCode      String          @id @unique
-  itemType      String
-  boxNumber     String
-  spaceNumber   String
-  examType      String
-  status        String
-  createdAt     DateTime        @default(now())
-  statusLogs    ItemStatusLog[] @relation("SlideStatusLogs")
+  itemCode    String          @id @unique
+  itemType    String
+  boxNumber   String
+  spaceNumber String
+  examType    String
+  status      String
+  createdAt   DateTime        @default(now())
+  statusLogs  ItemStatusLog[] @relation("SlideStatusLogs")
 }
 
 model User {
   id        Int      @id @default(autoincrement())
-  uid       String?   @unique // Inicialmente opcional
+  uid       String?  @unique // Inicialmente opcional
   name      String?  @db.VarChar(255)
   photoURL  String?
   role      String   @default("user")
