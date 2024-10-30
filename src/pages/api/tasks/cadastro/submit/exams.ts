@@ -13,6 +13,7 @@ export default async function handler(
 
   // Acessa o corpo da requisição diretamente, sem os parênteses
   const data = req.body;
+  console.log(data)
 
   try {
     const exam = await prisma.exam.create({
@@ -23,6 +24,7 @@ export default async function handler(
         description: data.description,
         patientId: data.patientId,
         doctorId: data.doctorId,
+        clinicId: data.clinicId,
         fileUrls: data.fileUrls,
         criadoPor: data.criadoPor || "SISTEMA",
         ...(data.hemogramaId && {

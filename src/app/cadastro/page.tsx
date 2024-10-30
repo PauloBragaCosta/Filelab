@@ -960,7 +960,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <div className="flex flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 md:space-y-8 md:p-8">
+      <div className="flex flex-col space-y-2 p-2 sm:space-y-4 sm:p-4 md:space-y-6 md:p-6 lg:space-y-8 lg:p-8">
         <Header user={user} auth={auth} text="Admissão" />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -1017,9 +1017,9 @@ export default function Home() {
                     <Button type="submit" size="sm">Salvar Cadastro</Button>
                   </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
+                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
                   <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
-                    <Card>
+                    <Card className="w-full sm:w-full md:w-auto">
                       <CardHeader>
                         <CardTitle>Imagens e Anexos</CardTitle>
                         <CardDescription>
@@ -1142,7 +1142,7 @@ export default function Home() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="w-full sm:w-full md:w-auto">
                       <CardHeader>
                         <CardTitle>Dados do Tutor</CardTitle>
                         <CardDescription>
@@ -1158,7 +1158,7 @@ export default function Home() {
                               <IA specialBox={tutorBox} specialCroppedImage={tutorCroppedImage} name={tutor} />
                             </div>
 
-                            <div className="flex items-start space-x-4">
+                            <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:space-x-4 sm:space-y-0">
                               <div className="flex-shrink-0 pt-1">
                                 <AddTutor
                                   tag="Tutor"
@@ -1205,7 +1205,7 @@ export default function Home() {
                       </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="w-full sm:w-full md:w-auto">
                       <CardHeader>
                         <CardTitle>Dados do Paciente</CardTitle>
                         <CardDescription>
@@ -1221,7 +1221,7 @@ export default function Home() {
                               <IA specialBox={nameBox} specialCroppedImage={nameCroppedImage} name={name} />
                             </div>
 
-                            <div className="flex items-start space-x-4">
+                            <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:space-x-4 sm:space-y-0">
                               <div className="flex-shrink-0 pt-1">
                                 <AddPaciente
                                   tag="Animal"
