@@ -4,20 +4,21 @@ import React, { useCallback, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Link from 'next/link'
 import { Package2 } from 'lucide-react'
-import { CommandDialogSearch } from '@/components/compopages/CommandDialogSearch'
+import { CommandDialogSearch } from '@/components/compopages/arquivo/CommandDialogSearch'
 import { useItems } from '@/hooks/useItems'
 import { Item } from '@/types/item'
-import SessionMenu from '@/components/compopages/SessionMenu'
+import SessionMenu from '@/components/compopages/arquivo/SessionMenu'
 import dynamic from 'next/dynamic'
 import useFirebaseAuth from '@/hooks/useFirebaseAuth'
 import { useItemStatusLogs } from '@/hooks/useItemStatusLogs'
 import Header from '@/components/compopages/header'
+import LoadingPage from '@/components/compopages/arquivo/loading-page'
 
 // Importing components dynamically
-const VisaoGeral = dynamic(() => import('@/components/compopages/visaoGeral'), { ssr: false })
-const ItemDetails = dynamic(() => import('@/components/compopages/ItemDetails'), { ssr: false })
-const ItemStatusLogsTable = dynamic(() => import('@/components/compopages/ItemStatusLogsTable'), { ssr: false })
-const BoxSpaceItems = dynamic(() => import('@/components/compopages/BoxSpaceItems'), { ssr: false })
+const VisaoGeral = dynamic(() => import('@/components/compopages/arquivo/visaoGeral'), { ssr: false })
+const ItemDetails = dynamic(() => import('@/components/compopages/arquivo/ItemDetails'), { ssr: false })
+const ItemStatusLogsTable = dynamic(() => import('@/components/compopages/arquivo/ItemStatusLogsTable'), { ssr: false })
+const BoxSpaceItems = dynamic(() => import('@/components/compopages/arquivo/BoxSpaceItems'), { ssr: false })
 
 export default function Home() {
   const { user, loading, auth } = useFirebaseAuth()
@@ -44,7 +45,7 @@ export default function Home() {
   }, [selectedItem, updateItem])
 
   if (loading) {
-    return <p>Carregando...</p>
+    return <LoadingPage/>
   }
 
   if (!user) {

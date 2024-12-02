@@ -42,7 +42,7 @@ import { LockClosedIcon, LockOpen2Icon } from '@radix-ui/react-icons';
 import { useItems } from '@/hooks/useItems';
 import { toast, Toaster } from "sonner";
 import Link from 'next/link';
-import SessionMenu from '@/components/compopages/SessionMenu';
+import SessionMenu from '@/components/compopages/arquivo/SessionMenu';
 import useFirebaseAuth from '@/hooks/useFirebaseAuth';
 
 

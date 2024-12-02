@@ -1,12 +1,4 @@
-
-
-
-
-
-
-
 "use client"
-
 import { useMemo } from 'react'
 import { XAxis, Area, YAxis, AreaChart } from "recharts"
 import { TrendingUp } from "lucide-react"
@@ -55,7 +47,6 @@ export default function TaxaUtilizacaoCard({ items }: TaxaUtilizacaoCardProps) {
 
   return (
     <Card className=" relative overflow-hidden">
-      {/* Gráfico como fundo */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
         <ChartContainer
           config={{
@@ -111,7 +102,7 @@ export default function TaxaUtilizacaoCard({ items }: TaxaUtilizacaoCardProps) {
             {itensEmUso} de {totalItens} itens estão arquivados nesse momento
           </CardTitle>
 
-          <CardDescription>
+          
             <div className="flex flex-col gap-4 text-xs">
               <div className="flex items-center space-x-2 text-sm sm:text-base">
                 <span>
@@ -125,7 +116,7 @@ export default function TaxaUtilizacaoCard({ items }: TaxaUtilizacaoCardProps) {
               <span className="font-sans text-sm font-normal tracking-normal text-muted-foreground">
               </span>
             </div>
-          </CardDescription>
+         
 
         </CardHeader>
 

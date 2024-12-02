@@ -6,13 +6,10 @@ import Image from "next/image"
 import {
   ChevronLeft,
   Upload,
-  Printer,
   X,
   ChevronRight,
-  Info,
   Search,
   ScanEye,
-  Link,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -28,7 +25,6 @@ import {
   Select,
   SelectContent,
   SelectGroup,
-  SelectItem,
   SelectLabel,
   SelectTrigger,
   SelectValue,
@@ -39,16 +35,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import {
   Carousel,
   CarouselContent,
@@ -63,7 +49,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
@@ -78,7 +63,6 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
-import { HfInference } from "@huggingface/inference";
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 import { firebaseConfig } from '@/types/item'; // Certifique-se de ajustar o caminho para o seu firebaseConfig
 import { initializeApp } from 'firebase/app'
@@ -89,10 +73,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useMediaQuery } from '@react-hook/media-query'
-import { toast } from '@/components/ui/use-toast'
 import { LabelPrintingMenu } from './componentes/submit'
-import LoadingPage from '@/components/compopages/loading-page'
+import LoadingPage from '@/components/compopages/arquivo/loading-page'
 import { AddClinic } from './componentes/clinicAdd'
 
 type BoundingBox = {
@@ -667,25 +649,38 @@ export default function Home() {
 
   const fetchTutors = async () => {
     const response = await fetch('/api/tasks/cadastro/fetch-tutor-api')
-    if (!response.ok) throw new Error('Failed to fetch tutors')
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to fetch tutors: ${errorMessage}`);
+    }
     return response.json()
   }
 
   const fetchPatients = async () => {
     const response = await fetch('/api/tasks/cadastro/fetch-patient-api')
-    if (!response.ok) throw new Error('Failed to fetch patients')
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to fetch patients: ${errorMessage}`);
+    }
     return response.json()
   }
 
   const fetchDoctors = async () => {
     const response = await fetch('/api/tasks/cadastro/fetch-doctor-api')
-    if (!response.ok) throw new Error('Failed to fetch doctors')
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to fetch doctors: ${errorMessage}`);
+    }
     return response.json()
   }
 
+
   const fetchClinic = async () => {
     const response = await fetch('/api/tasks/cadastro/fetch-clinic-api')
-    if (!response.ok) throw new Error('Failed to fetch doctors')
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(`Failed to fetch clinic: ${errorMessage}`);
+    }
     return response.json()
   }
 

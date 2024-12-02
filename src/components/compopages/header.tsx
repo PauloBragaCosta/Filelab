@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Package2 } from "lucide-react";
-import SessionMenu from "./SessionMenu";
+import SessionMenu from "./arquivo/SessionMenu";
 import { Auth } from "firebase/auth";
+import { ComboboxSearch } from "../search/combobox-search";
 
 interface User {
   name: string;
@@ -22,7 +23,10 @@ export default function Header({ user, auth, text }: HeaderProps) {
         <Package2 className="h-6 w-6" />
         <h1 className="text-lg font-bold tracking-tight sm:text-xl md:text-2xl">{text}</h1>
       </Link>
-      <SessionMenu userName={user.name} userPhoto={user.photo} auth={auth} />
+      <div className="flex gap-8">
+        <ComboboxSearch />
+        <SessionMenu userName={user.name} userPhoto={user.photo} auth={auth} />
+      </div>
     </header>
   );
 }

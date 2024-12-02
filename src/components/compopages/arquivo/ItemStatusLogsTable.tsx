@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { RegisterLog } from '@/components/compopages/registerLog';
+import { RegisterLog } from '@/components/compopages/arquivo/registerLog';
 
 interface LogItem {
   id: string;

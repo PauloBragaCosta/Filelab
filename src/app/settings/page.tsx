@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import SessionMenu from '@/components/compopages/SessionMenu'
+import SessionMenu from '@/components/compopages/arquivo/SessionMenu'
 import { Input } from '@/components/ui/input'
 import useFirebaseAuth from '@/hooks/useFirebaseAuth'
 import Header from '@/components/compopages/header'
