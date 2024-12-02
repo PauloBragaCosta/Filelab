@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input"
 import { FilterSelector } from "./filter-selector"
 import { SearchResults } from "./search-results"
 import { filters } from "@/search/filters"
-import { Exam } from "@/types/exam"
+import { Exam, SearchableFields } from "@/types/exam"
 import { useSearchExams } from "@/hooks/search/use-search-exams"
 
 export function ComboboxSearch() {
   const router = useRouter()
-  const [filterValue, setFilterValue] = React.useState<string>(filters[0].value)
+  const [filterValue, setFilterValue] = React.useState<SearchableFields>(filters[0].value as SearchableFields)
   const [searchTerm, setSearchTerm] = React.useState("")
   const { searchResults, handleSearch } = useSearchExams(filterValue)
   const [selectedIndex, setSelectedIndex] = React.useState(-1)
@@ -27,7 +27,7 @@ export function ComboboxSearch() {
 
   const handleFilterChange = (value: string) => {
     const newFilter = value || filters[0].value
-    setFilterValue(newFilter)
+    setFilterValue(newFilter as SearchableFields)
     handleSearch(searchTerm)
     inputRef.current?.focus()
   }
