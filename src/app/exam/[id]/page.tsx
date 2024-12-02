@@ -9,11 +9,11 @@ export async function generateStaticParams() {
   }))
 }
 
-type Props = {
-  params: { id: string }
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: { id: string } 
+}): Promise<Metadata> {
   const exam = simulatedDatabase.find(item => item.id.toString() === params.id)
   
   if (!exam) {
@@ -29,7 +29,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function ExamPage({ params }: Props) {
+export default function ExamPage({ 
+  params 
+}: { 
+  params: { id: string } 
+}) {
   const exam = simulatedDatabase.find(item => item.id.toString() === params.id)
 
   if (!exam) {
